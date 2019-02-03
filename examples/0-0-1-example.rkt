@@ -1,18 +1,32 @@
 #lang racket
 
 (require "../lib/web-sourcery.rkt")
+
+;; Specify a Database
 (sourcery-db "0-0-1-server.db")
 
+;; Create Sourcery Structures
 (sourcery-struct session [(path STRING)])
+(sourcery-struct data [(field STRING) (timestamp INTEGER)])
 
-(create-web-sourcery-app app)
+;; Define an application
+(define-web-sourcery-app app)
 
-(route app "/example"
-(define (test-1)
-  (session-path (session-create "/example"))))
 
-(route app "/data"
-(define (test-2)
-  (foldl (λ (s cur) (string-append (session-path s) " " cur)) "" (sourcery-load session))))
+;; Define Routes
+;; ---------------------------------------------------
 
-(run-web-sourcery-app app)
+
+(define-route [app "/example"]
+  (session-path (session-create "/example")))
+
+
+(define-route [app "/data"]
+  (for/fold ((cur "")) ((s (sourcery-load session)))
+    (string-append (session-path s) "<br>" cur)))
+
+
+;; ---------------------------------------------------
+
+;; Run Application from a custom port
+(run-web-sourcery-app app #:cors? #t #:port 100)

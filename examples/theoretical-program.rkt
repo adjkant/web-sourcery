@@ -9,25 +9,25 @@
 
 ;; A basic "Hello World" route
 (route app "/hello-world" (methods GET))
-(define (hello-world params headers cookies)
+(define (hello-world query-params headers cookies)
   (web-sourcery-response "Hello World" 200))
 
 
 ;; Accept POST JSON Data and give back the first pair only
 (route app "/accept-json" (methods POST))
-(define (hello-world headers cookies data)
-  (web-sourcery-response (first data) 200))
+(define (accept-json headers cookies data)
+  (convert-to-json (web-sourcery-response (first data) 200)))
 
 
 ;; Route Parameters
 (route app "/<x:int>" (methods GET POST UPDATE DELETE))
-(define (hello-world query-params headers cookies)
+(define (any-int route-params headers cookies)
   (web-sourcery-response (route-params "x") 200))
 
 
 ;; Headers and Cookies Access
 (route app "/headers-and-cookies" (methods GET))
-(define (hello-world route-params query-params headers cookies)
+(define (headers-cookies query-params query-params headers cookies)
   (web-sourcery-response
    (string-append (headers "Content-Type") (cookies "session_token"))
    200))
