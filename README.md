@@ -54,7 +54,7 @@ WebSourcery will also include a testing library to make simulating requests easy
 - [ ] Single Folder / Convention
 - [ ] Default Static Folder
 
-##### HTML Templating
+##### HTML Templating (Using Formlets)
 - [ ] Basic Key / Values
 - [ ] List and Repeat Constructs
 - [ ] If / Else Server Inclusion
