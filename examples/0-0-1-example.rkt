@@ -29,4 +29,6 @@
 ;; ---------------------------------------------------
 
 ;; Run Application from a custom port
-(run-web-sourcery-app app #:cors? #t #:port 100)
+(run-web-sourcery-app app
+                      #:cors? #t
+                      #:port 100)
