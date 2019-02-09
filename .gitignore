@@ -1,5 +1,15 @@
-*~
+# Filesystem Related
 *.DS_Store
-*#*
-lib/compiled/
+
+# Racket related
+compiled
+.\#*
+\#*
+*~
+
+# Database files
 *.db
+
+# Docs Output
+web-sourcery/scribblings/*
+!web-sourcery/scribblings/web-sourcery.scrbl

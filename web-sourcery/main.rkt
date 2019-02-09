@@ -3,12 +3,13 @@
 (provide define-web-sourcery-app
          define-route
          run-web-sourcery-app
-         (all-from-out "../include/sql-sourcery/lib/sql-sourcery.rkt"))
+         (all-from-out sql-sourcery))
 
 (require web-server/servlet
          web-server/servlet-env
-         (for-syntax syntax/parse)
-         "../include/sql-sourcery/lib/sql-sourcery.rkt")
+         sql-sourcery
+         (for-syntax syntax/parse
+                     racket/syntax))
 
 
 ;; Internal Data Definitions
@@ -27,13 +28,11 @@
 
 
 ;; Top Level Route Definition
+;; TODO give name for debugging
 (define-syntax define-route
   (syntax-parser
     [(_ [app-name:id path:string] route-body)
-     (let [(route-func (gensym "routing-func-"))]
-     #'(begin
-         (define (route-func) route-body)
-         (set! app-name (cons (ws-route path route-func) app-name))))]))
+     #'(set! app-name (cons (ws-route path (λ () route-body)) app-name))]))
 
 
 ;; Route a request to the apropriate handler
@@ -47,6 +46,7 @@
 
 
 ;; Start a WebSourcery Server
+;; TODO https://docs.racket-lang.org/syntax/wrapc.html?q=syntax%20contract
 (define-syntax run-web-sourcery-app
   (syntax-parser
     [(_ app-name
@@ -66,5 +66,5 @@
                         #:port port
                         #:command-line? #t
                         #:servlet-regexp #rx""
-                        #:listen-ip (and cors? public?)
+                        #:listen-ip public?
                         #:stateless? #t))]))

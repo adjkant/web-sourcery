@@ -1,6 +1,6 @@
 #lang racket
 
-(require "../lib/web-sourcery.rkt")
+(require "../web-sourcery/main.rkt")
 
 ;; Specify a Database
 (sourcery-db "0-0-1-server.db")
@@ -31,4 +31,4 @@
 ;; Run Application from a custom port
 (run-web-sourcery-app app
                       #:cors? #t
-                      #:port 100)
+                      #:port 1000)

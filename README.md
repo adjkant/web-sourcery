@@ -37,6 +37,8 @@ WebSourcery will also include a testing library to make simulating requests easy
 - [ ] POST Data
 - [ ] Cookies
 - [ ] Headers - Full or Filtered?
+
+##### Request Outputs
 - [ ] Status Codes
 - [ ] Return Types (JSON, HTML, Plaintext, ...?)
 
