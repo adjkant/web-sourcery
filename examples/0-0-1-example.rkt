@@ -1,6 +1,7 @@
 #lang racket
 
 (require "../web-sourcery/main.rkt")
+(require sql-sourcery)
 
 ;; Specify a Database
 (sourcery-db "0-0-1-server.db")
@@ -16,14 +17,20 @@
 ;; Define Routes
 ;; ---------------------------------------------------
 
-
 (define-route [app "/example"]
-  (session-path (session-create "/example")))
-
+  (session-path (session-create "/z")))
 
 (define-route [app "/data"]
-  (for/fold ((cur "")) ((s (sourcery-load session)))
-    (string-append (session-path s) "<br>" cur)))
+  (begin
+    (session-path (session-create "/data"))
+    (for/fold ((cur "")) ((s (sourcery-load session)))
+      (string-append (session-path s) "<br>" cur))))
+
+(define-route [app "/<int:todo>"]
+  (session-path (session-create "Matched an int!")))
+
+(define-route [app "/<string:todo>"]
+  (session-path (session-create "Matched a string!")))
 
 
 ;; ---------------------------------------------------
