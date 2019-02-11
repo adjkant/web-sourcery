@@ -43,9 +43,9 @@ WebSourcery will also include a testing library to make simulating requests easy
 - [ ] Return Types (JSON, HTML, Plaintext, ...?)
 
 ##### Routing
-- [ ] Pattern Matching
-- [ ] Route Parameters
-- [ ] Typing
+- [X] Pattern Matching
+- [X] Route Parameters
+- [X] Typing
 - [ ] Handler Connection
 
 ##### JSON
