@@ -26,11 +26,12 @@
     (for/fold ((cur "")) ((s (sourcery-load session)))
       (string-append (session-path s) "<br>" cur))))
 
-(define-route [app "/<int:todo>"]
-  (session-path (session-create "Matched an int!")))
+(define-route [app "/<int:param-num>"]
+  (session-path (session-create (string-append "Matched an int: "
+                                               (number->string param-num)))))
 
-(define-route [app "/<string:todo>"]
-  (session-path (session-create "Matched a string!")))
+(define-route [app "/<string:param-string>"]
+  (session-path (session-create (string-append "Matched a string: " param-string))))
 
 
 ;; ---------------------------------------------------

@@ -6,7 +6,7 @@
 
 (require web-server/servlet
          web-server/servlet-env
-         "routing.rkt"
+         "routing/routing.rkt"
          (for-syntax syntax/parse
                      racket/syntax))
 

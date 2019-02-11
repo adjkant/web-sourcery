@@ -22,4 +22,17 @@ Testing
 - testing format with modules, tests per file? Way to run at top level? Any need?
 
 
+
+
+Responses:
+
+
+- Sandboxing: Ask Eli
+
+- Docs
+ - Subsections
+
+Testing
+- Module+ per file, raco test
+
 |#
