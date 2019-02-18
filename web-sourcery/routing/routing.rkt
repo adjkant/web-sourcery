@@ -32,8 +32,8 @@
 ;; Request WSApp -> String
 ;; Route a request to the apropriate handler and return the result
 (define (match-request-to-route req app)
-  (define path-string (first (map path/param-path (url-path (request-uri req)))))
-  (define req-path (string->request-path path-string))
+  (define req-path-string (first (map path/param-path (url-path (request-uri req)))))
+  (define req-path (string->request-path req-path-string))
   (define matched-route (best-matching-route req-path app))
   (if matched-route
       (apply (ws-route-handler matched-route)

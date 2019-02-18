@@ -13,6 +13,7 @@
    (parameterize ([sandbox-output 'string]
                   [sandbox-error-output 'string]
                   [sandbox-memory-limit 50])
+     (sandbox-path-permissions (list (list 'write "../")))
      (make-evaluator 'racket
                      #:requires (list "../main.rkt"))))
 
