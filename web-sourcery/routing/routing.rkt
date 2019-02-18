@@ -32,13 +32,16 @@
 ;; Request WSApp -> String
 ;; Route a request to the apropriate handler and return the result
 (define (match-request-to-route req app)
-  (define req-path-string (first (map path/param-path (url-path (request-uri req)))))
-  (define req-path (string->request-path req-path-string))
+  (define req-path-strings (map path/param-path (url-path (request-uri req))))
+  (define req-path (strings->request-path req-path-strings))
   (define matched-route (best-matching-route req-path app))
   (if matched-route
       (apply (ws-route-handler matched-route)
              (parse-path-args req-path (ws-route-path-temp matched-route)))
       "No Matching Route - 404 TODO"))
+
+;; TODO check validity of route and trim empty string at end of routes
+;; User Note: "Trailing slashes are ignored during routing"
 
 
 

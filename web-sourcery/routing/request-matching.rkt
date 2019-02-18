@@ -1,6 +1,6 @@
 #lang racket
 
-(provide string->request-path
+(provide strings->request-path
          best-matching-route
          parse-path-args)
 
@@ -15,15 +15,15 @@
 
 ;; String -> RequestPath
 ;; convert a string into a list of reuqest path parts
-(define (string->request-path path)
-  (map string->request-path-part (string-split path "/")))
+(define (strings->request-path path-part-strings)
+  (map string->request-path-part path-part-strings))
 
 (module+ test
-  (check-equal? (string->request-path "hello/world") REQ-PATH-1)
-  (check-equal? (string->request-path "/hello/world/a/bit/longer") REQ-PATH-2)
-  (check-equal? (string->request-path "1") REQ-PATH-4)
-  (check-equal? (string->request-path "1/2/3") REQ-PATH-5)
-  (check-equal? (string->request-path "-1") REQ-PATH-6))
+  (check-equal? (strings->request-path (list "hello" "world")) REQ-PATH-1)
+  (check-equal? (strings->request-path (string-split "/hello/world/a/bit/longer" "/")) REQ-PATH-2)
+  (check-equal? (strings->request-path (list "1")) REQ-PATH-4)
+  (check-equal? (strings->request-path (list "1" "2" "3")) REQ-PATH-5)
+  (check-equal? (strings->request-path (list "-1")) REQ-PATH-6))
   
 
 ;; String -> RequestPathPart
@@ -51,7 +51,7 @@
   (filter (compose not false?) (map parse-path-arg req-path path-temp)))
 
 (module+ test
-  (check-equal? (parse-path-args (string->request-path "/1/2/3")
+  (check-equal? (parse-path-args (strings->request-path (list "1" "2" "3"))
                                  PATH-TEMP-6)
                 (list 1 2 3))
   (check-equal? (parse-path-args (list REQ-PART-3 REQ-PART-11 REQ-PART-12)
@@ -115,13 +115,16 @@
   (define basic-matching-routes
     (filter (λ (mr) (not (member? #false (ws-matched-route-results mr))))
             matched-results))
-  (select-preferred-route basic-matching-routes))
+  (when/f (cons? basic-matching-routes)
+          (select-preferred-route basic-matching-routes)))
 
+;; TODO testing
 
 ;; [List-of MatchedRoute] -> [Maybe Route]
 ;; Using the routing rules and given routes that basic match to their match sets, select the
 ;; preferred route
 ;; Invariants:
+;; - matched routes list is nonempty
 ;; - All [List-of PathPartMatchResult] and PathTemplate are of the same length
 ;; - No PathPartMatchResult are #false
 ;; - All [List-of MatchedRoute] are unique (TODO on caller)
@@ -140,6 +143,10 @@
 (module+ test
   (check-false (next-preferred-if-nonempty '()))
   (check-equal? (ws-route-path-temp (select-preferred-route MATCHED-ROUTES-1)) PATH-TEMP-1))
+
+;; TODO add test cases
+;; no basic matching routes
+;; more...
 
 ;; PathPartMatchResult [Maybe PathParamType] -> [MatchResult -> Boolean]
 ;; create a boolean filter function to select MatchResults with only
