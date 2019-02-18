@@ -16,53 +16,59 @@ WebSourcery will also include a testing library to make simulating requests easy
 ### Primary Feature Set
 
 * Simple Setup and Running
-* URL Routing
-* Static Files and HTML Templating
+* URL Routing with simplified essentials (HTTP Verbs, Cookies, Headers, JSON POST Data)
 * Integrated JSON Support
 * Simulated Requests Testing Library
+* Static Files and HTML Templating
 * SQLSourcery - Database ORM for Structures
 
 
 ### Worklist
 
 ##### Setup
-- [ ] CORS Support
 - [x] Port Specification
-- [ ] Statefulness Decisions
 - [x] Local Connections Only T/F
+- [ ] CORS Support
+- [ ] Statefulness Decisions
 
 ##### Request Inputs
 - [x] Route
-- [ ] Parameters
-- [ ] POST Data
+- [x] Parameters
 - [ ] Cookies
 - [ ] Headers - Full or Filtered?
+- [ ] POST Data
 
 ##### Request Outputs
 - [ ] Status Codes
 - [ ] Return Types (JSON, HTML, Plaintext, ...?)
+- [ ] Headers
+- [ ] Cookies
 
 ##### Routing
-- [X] Pattern Matching
-- [X] Route Parameters
-- [X] Typing
-- [ ] Handler Connection
+- [x] Pattern Matching
+- [x] Route Parameters
+- [x] Typing
+- [x] Handler Connection
 
 ##### JSON
-- [ ] Input JSON Parsing
+- [ ] Input JSON Parsing (POST data)
 - [ ] Output JSON Automation
 
 ##### Static Files
 - [ ] Single Folder / Convention
 - [ ] Default Static Folder
 
-##### HTML Templating (Using Formlets)
-- [ ] Basic Key / Values
-- [ ] List and Repeat Constructs
-- [ ] If / Else Server Inclusion
-
 ##### Testing
 - [ ] Quick Request Creation Shortcuts
 - [ ] Simulated Router/Handler Calls
 - [ ] JSON Testing (riposte - german company?)
 - [ ] HTML Template Testing
+
+##### HTML Templating (Using Formlets)
+- [ ] Basic Key / Values
+- [ ] List and Repeat Constructs
+- [ ] If / Else Server Inclusion
+
+##### Additional Features
+- [ ] CORS by function
+- [ ] Combining / Modularizing Apps  
