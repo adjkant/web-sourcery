@@ -6,11 +6,10 @@
 (require web-server/servlet
          "path-template.rkt"
          "request-matching.rkt"
-         "ws-route.rkt"
-         "../utils.rkt")
+         "../data-defs.rkt"
+         "../utils/basics.rkt")
 (require (for-syntax syntax/parse
                      racket/syntax
-                     racket/string
                      "path-template.rkt"))
 
 ;; Top Level Route Definition
@@ -30,14 +29,16 @@
                    app-name))]))
 
 
-;; Request WSApp -> Bytes
+;; Request WSApp -> String
 ;; Route a request to the apropriate handler and return the result
 (define (match-request-to-route req app)
-  (define stuff (first (map path/param-path (url-path (request-uri req)))))
+  (define path-string (first (map path/param-path (url-path (request-uri req)))))
   (define req-path (string->request-path path-string))
   (define matched-route (best-matching-route req-path app))
   (if matched-route
-      (string->bytes/utf-8 (apply (ws-route-handler matched-route)
-                                  (parse-path-args req-path (ws-route-path-temp matched-route))))
-      (string->bytes/utf-8 "No Matching Route - 404 TODO")))
+      (apply (ws-route-handler matched-route)
+             (parse-path-args req-path (ws-route-path-temp matched-route)))
+      "No Matching Route - 404 TODO"))
+
+
 

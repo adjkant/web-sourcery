@@ -3,8 +3,8 @@
 (provide string->path-template
          get-param-names)
 
-(require "ws-route.rkt"
-         "../utils.rkt")
+(require "../data-defs.rkt"
+         "../utils/basics.rkt")
 
 (define MIN-PATH-PARAM-STRING-SIZE (string-length "<int:a>"))
 (define VALID-ROUTE-PARAM-TYPES (list "string" "int"))

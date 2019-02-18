@@ -42,4 +42,6 @@
                                        (current-seconds)
                                        TEXT/HTML-MIME-TYPE
                                        '()
-                                       (list (match-request-to-route req app-name)))))]))
+                                       (list
+                                        (string->bytes/utf-8
+                                         (match-request-to-route req app-name))))))]))
