@@ -18,7 +18,7 @@
 ;; ---------------------------------------------------
 
 (define-route [app "/example"]
-  (session-path (session-create "example")))
+  (session-path (session-create (headers "a"))))
 
 (define-route [app "/data"]
   (begin

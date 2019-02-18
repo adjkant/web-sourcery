@@ -5,7 +5,9 @@
 (provide (struct-out ws-route)
          (struct-out ws-route-param)
          (struct-out ws-req-path-part)
-         (struct-out ws-matched-route))
+         (struct-out ws-matched-route)
+         (struct-out ws-header)
+         (struct-out ws-cookie))
 
 
 ;; A Route (ws-route PathTemplate RouteHandler)
@@ -42,3 +44,9 @@
 ;; - 'exact
 ;; - 'param
 ;; - #false
+
+(struct ws-header [field value] #:transparent)
+;; A Header is a (ws-header String String)
+
+(struct ws-cookie [name value] #:transparent)
+;; A Cookie is a (ws-header String String)
