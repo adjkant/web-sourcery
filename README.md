@@ -34,8 +34,8 @@ WebSourcery will also include a testing library to make simulating requests easy
 ##### Request Inputs
 - [x] Route
 - [x] Parameters
-- [ ] Cookies
-- [ ] Headers - Full or Filtered?
+- [x] Cookies
+- [x] Headers - Full or Filtered?
 - [ ] POST Data
 
 ##### Request Outputs

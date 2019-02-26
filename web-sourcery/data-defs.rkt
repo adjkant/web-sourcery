@@ -6,14 +6,17 @@
          (struct-out ws-route-param)
          (struct-out ws-req-path-part)
          (struct-out ws-matched-route)
+         (struct-out ws-request)
          (struct-out ws-header)
          (struct-out ws-cookie))
 
 
+;; A WSApp is a [List-of Route]
+
 ;; A Route (ws-route PathTemplate RouteHandler)
 (struct ws-route [path-temp handler] #:transparent)
 
-;; A RouteHandler is a [RouteArg ... -> String]
+;; A RouteHandler is a [RouteArg ... [String -> [Maybe Header]] [String -> [Maybe Cookie]] -> String]
 
 ;; PathTemplate is a [List-of PathPart]
 
@@ -44,6 +47,9 @@
 ;; - 'exact
 ;; - 'param
 ;; - #false
+
+(struct ws-request [path params method headers cookies] #:transparent)
+;; A Request is a (ws-request [List-of RequestPathPart] #f #f [List-of Header] [List-of Cookie])
 
 (struct ws-header [field value] #:transparent)
 ;; A Header is a (ws-header String String)

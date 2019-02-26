@@ -10,7 +10,7 @@
          (for-syntax syntax/parse
                      racket/syntax))
 
-;; A WSApp is a [List-of Route]
+(module+ test (require "utils/testing.rkt"))
 
 ;; Constants
 (define DEFAULT-PORT 9000)
@@ -21,6 +21,13 @@
 (define-syntax define-web-sourcery-app
   (syntax-parser
     [(_ app-name:id) #'(define app-name '())]))
+
+(module+ test
+  (check-compile-error (define-web-sourcery-app x y))
+  (check-compile-error (define-web-sourcery-app))
+  (check-compile-error (define-web-sourcery-app "string"))
+  (check-compile-error (define-web-sourcery-app 1))
+  (check-compile-error (define-web-sourcery-app 'symbol)))
 
 ;; Start a WebSourcery Server
 ;; TODO https://docs.racket-lang.org/syntax/wrapc.html?q=syntax%20contract
@@ -37,11 +44,16 @@
                       #:listen-ip public?
                       #:stateless? #t
                       (λ (req)
-                        (response/full 200
-                                       #"Ok"
-                                       (current-seconds)
-                                       TEXT/HTML-MIME-TYPE
-                                       '()
-                                       (list
-                                        (string->bytes/utf-8
-                                         (match-request-to-route req app-name))))))]))
+                        (handle-any-request req app-name)))]))
+
+(module+ test
+  (check-compile-error (begin
+                            (define-web-sourcery-app app)
+                            (run-web-sourcery-app app 2)))
+  (check-compile-error (begin
+                            (define-web-sourcery-app app)
+                            (run-web-sourcery-app app #:portt 1)))
+  
+  (check-compile-error (begin
+                            (define-web-sourcery-app app)
+                            (run-web-sourcery-app app #:port "a"))))

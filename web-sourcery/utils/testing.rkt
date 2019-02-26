@@ -5,8 +5,6 @@
  ;; Basic Testing via Racket
  (all-from-out rackunit)
 
- ;; Checking compile-time errors
- compile
  syntax
 
  ;; All In File
@@ -22,6 +20,11 @@
   (syntax-parser
     [(_ exn-expr failure-message:string) #'(check-exn exn:fail? (λ () exn-expr) failure-message)]
     [(_ exn-expr) #'(check-exn exn:fail? (λ () exn-expr))]))
+
+(define-syntax check-compile-error
+  (syntax-parser
+    [(_ cmp-exn-expr failure-message:string) #`(check-error (compile #'cmp-exn-expr) failure-message)]
+    [(_ cmp-exn-expr) #`(check-error (compile #'cmp-exn-expr))]))
 
 (define REQ-PART-1 (ws-req-path-part "hello" '(string)))
 (define REQ-PART-2 (ws-req-path-part "world" '(string)))
@@ -42,6 +45,23 @@
 (define REQ-PATH-4 (list REQ-PART-7))
 (define REQ-PATH-5 (list REQ-PART-7 REQ-PART-8 REQ-PART-9))
 (define REQ-PATH-6 (list REQ-PART-10))
+
+(define COOKIE-1 (ws-cookie "a" "b"))
+(define COOKIE-2 (ws-cookie "num" "1"))
+(define COOKIE-3 (ws-cookie "sessionToken" "h4ck3r"))
+
+(define COOKIES-1 (list COOKIE-1 COOKIE-2 COOKIE-3))
+
+(define HEADER-1 (ws-header "Content-Type" "application/json"))
+(define HEADER-2 (ws-header "timestamp" "1550796402"))
+(define HEADER-3 (ws-header "secret" "shhhhh"))
+
+(define HEADERS-1 (list HEADER-1 HEADER-2 HEADER-3))
+
+(define REQ-1 (ws-request REQ-PATH-1 #f #f '() '()))
+(define REQ-2 (ws-request REQ-PATH-2 #f #f HEADERS-1 COOKIES-1))
+(define REQ-3 (ws-request REQ-PATH-3 #f #f HEADERS-1 COOKIES-1))
+(define REQ-4 (ws-request REQ-PATH-4 #f #f HEADERS-1 COOKIES-1))
 
 (define ROUTE-PARAM-STR (ws-route-param "matched-string" 'string))
 (define ROUTE-PARAM-INT (ws-route-param "matched-int" 'int))

@@ -1,42 +1,13 @@
 #lang racket
 
-(provide strings->request-path
-         best-matching-route
+(provide best-matching-route
          parse-path-args)
 
 (require "../data-defs.rkt"
          "../utils/basics.rkt")
 
-(module+ test (require "../utils/testing.rkt"))
-
-;; ---------------------------------------------------------------------------------------------------
-;; RequestPath Generation
-
-
-;; String -> RequestPath
-;; convert a string into a list of reuqest path parts
-(define (strings->request-path path-part-strings)
-  (map string->request-path-part path-part-strings))
-
-(module+ test
-  (check-equal? (strings->request-path (list "hello" "world")) REQ-PATH-1)
-  (check-equal? (strings->request-path (string-split "/hello/world/a/bit/longer" "/")) REQ-PATH-2)
-  (check-equal? (strings->request-path (list "1")) REQ-PATH-4)
-  (check-equal? (strings->request-path (list "1" "2" "3")) REQ-PATH-5)
-  (check-equal? (strings->request-path (list "-1")) REQ-PATH-6))
-  
-
-;; String -> RequestPathPart
-;; convert a single string into a request path part
-(define (string->request-path-part part)
-  (if (and (string->number part) (integer? (string->number part)))
-      (ws-req-path-part part '(int string))
-      (ws-req-path-part part '(string))))
-
-(module+ test
-  (check-equal? (string->request-path-part "test") (ws-req-path-part "test" '(string)))
-  (check-equal? (string->request-path-part "1") (ws-req-path-part "1" '(int string)))
-  (check-equal? (string->request-path-part "-1") (ws-req-path-part "-1" '(int string))))
+(module+ test (require "../utils/testing.rkt"
+                       "../data-conversion.rkt"))
 
 
 ;; ---------------------------------------------------------------------------------------------------
