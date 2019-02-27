@@ -50,7 +50,7 @@
   (session-path (session-create (string-append "Matched a string: " param-string))))
 
 (define-route [app "/query-param-value-x" [GET]]
-  (session-path (session-create (format "query param x value: ~s" (query-param "x")))))
+  (session-path (session-create (format "query param x value: ~s" (query-params "x")))))
 
 (define-route [app "/header/<string:header-field>" [GET]]
   (if (headers header-field)
@@ -61,6 +61,9 @@
   (if (cookies cookie-name)
       (cookies cookie-name)
       "No Matching Cookie"))
+
+(define-route [app "/<int:param-num-dupe>" [GET POST]]
+  "should never get here once feature is functional")
 
 ;; ---------------------------------------------------
 

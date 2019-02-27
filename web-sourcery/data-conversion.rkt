@@ -18,7 +18,7 @@
    (request->ws-method req)
    (strings->request-path (trim-trailing-empty-string (map path/param-path
                                                            (url-path (request-uri req)))))
-   #f
+   (request->ws-query-params req)
    (request->ws-headers req)
    (request->ws-cookies req)))
 
@@ -61,6 +61,17 @@
 (define (request->ws-method req)
   (define method-symbol (string->symbol (string-upcase (bytes->string/utf-8 (request-method req)))))
   (ws-method method-symbol))
+
+
+;; web-server/http/request -> [List-of QueryParam]
+;; Get a list of query params from a request
+(define (request->ws-query-params req)
+  (map query-param->ws-query-param (url-query (request-uri req))))
+
+;; [Pair Symbol [Maybe String]] -> QueryParam
+;; Get a structured QueryParam from a query param 
+(define (query-param->ws-query-param qp)
+  (ws-query-param (symbol->string (car qp)) (cdr qp)))
 
 
 ;; web-server/http/request -> [List-of Cookie]

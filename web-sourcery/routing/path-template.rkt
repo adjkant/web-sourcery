@@ -1,6 +1,7 @@
 #lang racket
 
 (provide string->path-template
+         analagous-path-template?
          get-param-names)
 
 (require "../data-defs.rkt"
@@ -10,6 +11,11 @@
 
 (define MIN-PATH-PARAM-STRING-SIZE (string-length "<int:a>"))
 (define VALID-ROUTE-PARAM-TYPES (list "string" "int"))
+
+;; PathTemplate PathTemplate -> Boolean
+;; determine if the two given path templates would match to the same route sets
+(define (analagous-path-template? t1 t2)
+  #t)
 
 ;; String -> [Maybe PathTemplate]
 ;; convert a string into a PathTemplate or #false if any part is invalid

@@ -5,7 +5,8 @@
  POST POST?
  PUT PUT?
  DELETE DELETE?
- method->symbol)
+ method->symbol
+ method->string)
 
 (require "../data-defs.rkt")
 
@@ -16,6 +17,7 @@
 (define PUT (ws-method 'PUT))
 (define DELETE (ws-method 'DELETE))
 
+(define method->string (compose symbol->string ws-method-m))
 (define method->symbol ws-method-m)
 
 (define (GET? m)

@@ -9,7 +9,8 @@
          "handler-inputs.rkt"
          "../data-defs.rkt"
          "../data-conversion.rkt"
-         "../utils/basics.rkt")
+         "../utils/basics.rkt"
+         "../http/methods.rkt")
 
 (require (for-syntax syntax/parse
                      racket/syntax
@@ -61,15 +62,36 @@
      
      
      #`(set! app-name
-             (cons (ws-route (string->path-template path)
-                             (list method ...)
-                             (lambda #,handler-inputs route-body))
-                   app-name))]))
+             (add-route path
+                        (ws-route (string->path-template path)
+                                  (list method ...)
+                                  (lambda #,handler-inputs route-body))
+                        app-name))]))
 
 (module+ test
   (check-compile-error 
    (define-route [app "/<int:param>/<string:param>" [GET]]
      (session-path (session-create "blank")))))
+
+;; String Route WSApp
+;; adds a route while throwing an error if the route path would be a duplicate
+(define (add-route route-string route app)
+  (define added-route-path-temp (ws-route-path-temp route))
+  (define added-route-methods (ws-route-methods route))
+  (define duplicate-route?
+    (ormap
+     (λ (r)
+       (and (analagous-path-template? (ws-route-path-temp r) added-route-path-temp)
+            (map (λ (m) (member? m (ws-route-methods r))) added-route-methods))) 
+     app)) 
+  (if (not duplicate-route?)
+      (cons route app)
+      (error 'duplicate-route (format "duplicate route at: ~s [~s]"
+                                      route-string
+                                      (foldr (λ (ms acc) (string-append acc " " ms))
+                                             (method->string (first added-route-methods))
+                                             (map method->string (rest added-route-methods)))))))
+
 
 ;; web-server/http/request WSApp -> web-server/http/response
 ;; Handle any request to the server and return an apropriate response
@@ -97,11 +119,14 @@
 ;; Call the given route's handler with the given request info
 ;; or create a 404 response if no route is given
 (define (call-route-with-req route req)
+  (define path-params (parse-path-args (ws-request-path req) (ws-route-path-temp route)))
+  (define handler-request-inputs
+    (list (ws-request-method req)
+          (create-query-param-getter (ws-request-query-params req))
+          (create-header-getter (ws-request-headers req))
+          (create-cookie-getter (ws-request-cookies req))))
   (apply (ws-route-handler route)
-         (append (parse-path-args (ws-request-path req) (ws-route-path-temp route))
-                 (list (ws-request-method req)
-                       (create-header-getter (ws-request-headers req))
-                       (create-cookie-getter (ws-request-cookies req))))))
+         (append path-params handler-request-inputs)))
 
 
 (module+ test

@@ -8,6 +8,7 @@
          (struct-out ws-req-path-part)
          (struct-out ws-matched-route)
          (struct-out ws-request)
+         (struct-out ws-query-param)
          (struct-out ws-header)
          (struct-out ws-cookie))
 
@@ -61,7 +62,7 @@
 ;; - (ws-method 'DELETE)
 
 (struct ws-query-param [name value] #:transparent)
-;; A QueryParam is a (ws-query-param String String)
+;; A QueryParam is a (ws-query-param String [Maybe String])
 
 (struct ws-header [field value] #:transparent)
 ;; A Header is a (ws-header String String)

@@ -47,6 +47,12 @@
 (define REQ-PATH-5 (list REQ-PART-7 REQ-PART-8 REQ-PART-9))
 (define REQ-PATH-6 (list REQ-PART-10))
 
+(define QUERY-PARAM-1 (ws-query-param "x" "y"))
+(define QUERY-PARAM-2 (ws-query-param "num" "1"))
+(define QUERY-PARAM-3 (ws-query-param "sortOrder" "max"))
+
+(define QUERY-PARAMS-1 (list QUERY-PARAM-1 QUERY-PARAM-2 QUERY-PARAM-3))
+
 (define COOKIE-1 (ws-cookie "a" "b"))
 (define COOKIE-2 (ws-cookie "num" "1"))
 (define COOKIE-3 (ws-cookie "sessionToken" "h4ck3r"))
