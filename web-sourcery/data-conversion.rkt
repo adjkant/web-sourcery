@@ -15,9 +15,9 @@
 ;; Convert to an internal request representation
 (define (request->ws-request req)
   (ws-request
+   (request->ws-method req)
    (strings->request-path (trim-trailing-empty-string (map path/param-path
                                                            (url-path (request-uri req)))))
-   #f
    #f
    (request->ws-headers req)
    (request->ws-cookies req)))
@@ -33,8 +33,7 @@
 ;; String -> RequestPath
 ;; convert a string into a list of reuqest path parts
 (define (strings->request-path path-part-strings)
-  (begin (println path-part-strings)
-         (map string->request-path-part path-part-strings)))
+  (map string->request-path-part path-part-strings))
 
 (module+ test
   (check-equal? (strings->request-path (list "hello" "world")) REQ-PATH-1)
@@ -55,6 +54,13 @@
   (check-equal? (string->request-path-part "test") (ws-req-path-part "test" '(string)))
   (check-equal? (string->request-path-part "1") (ws-req-path-part "1" '(int string)))
   (check-equal? (string->request-path-part "-1") (ws-req-path-part "-1" '(int string))))
+
+
+;; web-server/http/request -> Method
+;; Get a Method from a request
+(define (request->ws-method req)
+  (define method-symbol (string->symbol (string-upcase (bytes->string/utf-8 (request-method req)))))
+  (ws-method method-symbol))
 
 
 ;; web-server/http/request -> [List-of Cookie]

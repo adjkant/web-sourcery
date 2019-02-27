@@ -2,11 +2,13 @@
 
 (provide define-web-sourcery-app
          define-route
-         run-web-sourcery-app)
+         run-web-sourcery-app
+         GET GET? POST POST? PUT PUT? DELETE DELETE? method->symbol)
 
 (require web-server/servlet
          web-server/servlet-env
          "routing/routing.rkt"
+         "http/methods.rkt"
          (for-syntax syntax/parse
                      racket/syntax))
 
@@ -48,12 +50,12 @@
 
 (module+ test
   (check-compile-error (begin
-                            (define-web-sourcery-app app)
-                            (run-web-sourcery-app app 2)))
+                         (define-web-sourcery-app app)
+                         (run-web-sourcery-app app 2)))
   (check-compile-error (begin
-                            (define-web-sourcery-app app)
-                            (run-web-sourcery-app app #:portt 1)))
+                         (define-web-sourcery-app app)
+                         (run-web-sourcery-app app #:portt 1)))
   
   (check-compile-error (begin
-                            (define-web-sourcery-app app)
-                            (run-web-sourcery-app app #:port "a"))))
+                         (define-web-sourcery-app app)
+                         (run-web-sourcery-app app #:port "a"))))

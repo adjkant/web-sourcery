@@ -73,13 +73,17 @@
        [mr (in-value (make-matched-route req-path r))]
        #:unless (member? #false (second mr)))
     mr)
-;; RequestPath [List-of Route] -> [Maybe Route]
-;; find the best matching route for the given RequestPath
-(define (best-matching-route req-path routes)
+;; Request [List-of Route] -> [Maybe Route]
+;; find the best matching route for the given Request
+(define (best-matching-route req routes)
+  (define req-path (ws-request-path req))
+  (define req-method (ws-request-method req))
   (define req-path-len (length req-path))
+  (define same-method-routes
+    (filter (λ (r) (member? req-method (ws-route-methods r))) routes))
   (define same-length-routes
     (filter (λ (r) (= req-path-len (length (ws-route-path-temp r))))
-            routes))
+            same-method-routes))
   (define matched-results
     (map (λ (r) (make-matched-route req-path r))
          same-length-routes))
@@ -89,7 +93,10 @@
   (when/f (cons? basic-matching-routes)
           (select-preferred-route basic-matching-routes)))
 
-;; TODO testing
+;; TODO extensive testing on this function
+;; TODO check validity of route and trim empty string at end of routes?
+;; User Note: "Trailing slashes are ignored during routing"
+   
 
 ;; [List-of MatchedRoute] -> [Maybe Route]
 ;; Using the routing rules and given routes that basic match to their match sets, select the
@@ -108,10 +115,11 @@
 ;; [List-of MatchedRoute] -> [Maybe Route]
 ;; generate next step of selecting a preferred route if the given matches are nonempty
 (define (next-preferred-if-nonempty rs)
-  (when/f (cons? rs)
+  (when/f (and (cons? rs) (cons? (ws-matched-route-results (first rs))))
           (select-preferred-route (map trim-matched-route rs))))
 
 (module+ test
+  (check-false (next-preferred-if-nonempty (list MATCHED-ROUTE-0 MATCHED-ROUTE-0)))
   (check-false (next-preferred-if-nonempty '()))
   (check-equal? (ws-route-path-temp (select-preferred-route MATCHED-ROUTES-1)) PATH-TEMP-1))
 
@@ -123,12 +131,14 @@
 ;; create a boolean filter function to select MatchResults with only
 ;; the given PathPartMatchResult and PathParamType in the first match result part
 (define ((create-match-filter part-match-res path-param-type) mr)
-  (and (eq? part-match-res (first (ws-matched-route-results mr)))
-       (if (false? path-param-type)
-           #true
-           (eq? path-param-type (ws-route-param-type (first (ws-matched-route-parts mr)))))))
+  (or (empty? (ws-matched-route-results mr))
+      (and (eq? part-match-res (first (ws-matched-route-results mr)))
+           (if (false? path-param-type)
+               #true
+               (eq? path-param-type (ws-route-param-type (first (ws-matched-route-parts mr))))))))
 
 (module+ test
+  (check-true ((create-match-filter 'exact #false) MATCHED-ROUTE-0))
   (check-true ((create-match-filter 'exact #false) MATCHED-ROUTE-1))
   (check-false ((create-match-filter 'exact #false) MATCHED-ROUTE-2))
   (check-true ((create-match-filter 'param 'string) MATCHED-ROUTE-3))
@@ -165,10 +175,10 @@
   (cond
     [(string? temp-part)
      (when/f (string=? (ws-req-path-part-string req-part) temp-part)
-       'exact)]
+             'exact)]
     [(ws-route-param? temp-part)
      (when/f (member? (ws-route-param-type temp-part) (ws-req-path-part-types req-part))
-       'param)]))
+             'param)]))
 
 (module+ test
   (check-equal? (req-part-match-route-temp-part-res REQ-PART-1 "hello") 'exact)

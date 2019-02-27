@@ -3,6 +3,7 @@
 ;; TODO rename to ws-structs
 
 (provide (struct-out ws-route)
+         (struct-out ws-method)
          (struct-out ws-route-param)
          (struct-out ws-req-path-part)
          (struct-out ws-matched-route)
@@ -13,8 +14,8 @@
 
 ;; A WSApp is a [List-of Route]
 
-;; A Route (ws-route PathTemplate RouteHandler)
-(struct ws-route [path-temp handler] #:transparent)
+;; A Route (ws-route PathTemplate [List-of Method] RouteHandler)
+(struct ws-route [path-temp methods handler] #:transparent)
 
 ;; A RouteHandler is a [RouteArg ... [String -> [Maybe Header]] [String -> [Maybe Cookie]] -> String]
 
@@ -48,8 +49,19 @@
 ;; - 'param
 ;; - #false
 
-(struct ws-request [path params method headers cookies] #:transparent)
-;; A Request is a (ws-request [List-of RequestPathPart] #f #f [List-of Header] [List-of Cookie])
+(struct ws-request [method path query-params headers cookies] #:transparent)
+;; A Request is a
+;; (ws-request Method [List-of RequestPathPart] [List-of QueryParam [List-of Header] [List-of Cookie])
+
+(struct ws-method [m] #:transparent)
+;; A Method is one of:
+;; - (ws-method 'GET)
+;; - (ws-method 'POST)
+;; - (ws-method 'UPDATE)
+;; - (ws-method 'DELETE)
+
+(struct ws-query-param [name value] #:transparent)
+;; A QueryParam is a (ws-query-param String String)
 
 (struct ws-header [field value] #:transparent)
 ;; A Header is a (ws-header String String)

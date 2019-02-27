@@ -26,14 +26,25 @@
                  '()
                  (list (string->bytes/utf-8 "No Matching Route - 404 TODO"))))
 
+(define RESPONSE-400-BAD-REQUEST-NO-STRING-RETURN
+  (response/full 400
+                 #"Bad Request"
+                 (current-seconds)
+                 TEXT/HTML-MIME-TYPE
+                 '()
+                 (list (string->bytes/utf-8 "Route handler did not return a string"))))
+
 ;; Top Level Route Definition
+;; TODO contacts on methods
 (define-syntax define-route
   (syntax-parser
-    [(_ [app-name:id path:string] route-body)
+    [(_ [app-name:id path:string [method ...]] route-body)
      (define path-template (string->path-template (syntax->datum #'path)))
      (define param-names (get-param-names path-template))
      (define param-ids (map (λ (n) (format-id #'path "~a" n)) param-names))
-     (define trailing-ids (list (format-id #'path "~a" "headers")
+     (define trailing-ids (list (format-id #'path "~a" "method")
+                                (format-id #'path "~a" "query-params")
+                                (format-id #'path "~a" "headers")
                                 (format-id #'path "~a" "cookies")))
      (define handler-inputs (append param-ids trailing-ids))
      
@@ -51,19 +62,20 @@
      
      #`(set! app-name
              (cons (ws-route (string->path-template path)
+                             (list method ...)
                              (lambda #,handler-inputs route-body))
                    app-name))]))
 
 (module+ test
   (check-compile-error 
-     (define-route [app "/<int:param>/<string:param>"]
-       (session-path (session-create "blank")))))
+   (define-route [app "/<int:param>/<string:param>" [GET]]
+     (session-path (session-create "blank")))))
 
 ;; web-server/http/request WSApp -> web-server/http/response
 ;; Handle any request to the server and return an apropriate response
 (define (handle-any-request req app)
   (define internal-req (request->ws-request req))
-  (define matching-route (match-request-to-route internal-req app))
+  (define matching-route (best-matching-route internal-req app))
   (if matching-route
       (create-response (call-route-with-req matching-route internal-req))
       RESPONSE-404-ROUTE-NOT-FOUND))
@@ -71,25 +83,14 @@
 ;; String -> web-server/http/response
 ;; Create a response from the given string
 (define (create-response str)
-  (response/full 200
-                 #"Ok"
-                 (current-seconds)
-                 TEXT/HTML-MIME-TYPE
-                 '()
-                 (list (string->bytes/utf-8 str))))
-
-;; Request WSApp -> String
-;; Route a request to the apropriate handler and return the result
-(define (match-request-to-route req app)
-  (best-matching-route (ws-request-path req) app))
-
-(module+ test
-  )
-
-;; TODO extensive testing on this function
-;; TODO check validity of route and trim empty string at end of routes
-;; User Note: "Trailing slashes are ignored during routing"
-   
+  (if (string? str)
+      (response/full 200
+                     #"Ok"
+                     (current-seconds)
+                     TEXT/HTML-MIME-TYPE
+                     '()
+                     (list (string->bytes/utf-8 str)))
+      RESPONSE-400-BAD-REQUEST-NO-STRING-RETURN))
 
 
 ;; Route Request -> String
@@ -98,9 +99,11 @@
 (define (call-route-with-req route req)
   (apply (ws-route-handler route)
          (append (parse-path-args (ws-request-path req) (ws-route-path-temp route))
-                 (list (create-header-getter (ws-request-headers req))
+                 (list (ws-request-method req)
+                       (create-header-getter (ws-request-headers req))
                        (create-cookie-getter (ws-request-cookies req))))))
 
 
 (module+ test
   )
+;; TODO testing

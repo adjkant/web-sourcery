@@ -13,6 +13,7 @@
 
 (require rackunit
          "../data-defs.rkt"
+         "../http/methods.rkt"
          (for-syntax syntax/parse
                      rackunit))
 
@@ -58,10 +59,10 @@
 
 (define HEADERS-1 (list HEADER-1 HEADER-2 HEADER-3))
 
-(define REQ-1 (ws-request REQ-PATH-1 #f #f '() '()))
-(define REQ-2 (ws-request REQ-PATH-2 #f #f HEADERS-1 COOKIES-1))
-(define REQ-3 (ws-request REQ-PATH-3 #f #f HEADERS-1 COOKIES-1))
-(define REQ-4 (ws-request REQ-PATH-4 #f #f HEADERS-1 COOKIES-1))
+(define REQ-1 (ws-request GET REQ-PATH-1 #f '() '()))
+(define REQ-2 (ws-request GET REQ-PATH-2 #f HEADERS-1 COOKIES-1))
+(define REQ-3 (ws-request GET REQ-PATH-3 #f HEADERS-1 COOKIES-1))
+(define REQ-4 (ws-request GET REQ-PATH-4 #f HEADERS-1 COOKIES-1))
 
 (define ROUTE-PARAM-STR (ws-route-param "matched-string" 'string))
 (define ROUTE-PARAM-INT (ws-route-param "matched-int" 'int))
@@ -69,6 +70,7 @@
 (define ROUTE-PARAM-I2  (ws-route-param "i2" 'int))
 (define ROUTE-PARAM-I3  (ws-route-param "i3" 'int))
 
+(define PATH-TEMP-0 '())
 (define PATH-TEMP-1 (list "hello" "world"))
 (define PATH-TEMP-2 (list "hello" "world" "a" "bit" "longer"))
 (define PATH-TEMP-3 (list ROUTE-PARAM-STR))
@@ -77,25 +79,36 @@
 (define PATH-TEMP-6 (list ROUTE-PARAM-I1 ROUTE-PARAM-I2 ROUTE-PARAM-I3))
 (define PATH-TEMP-7 (list "hello" ROUTE-PARAM-STR))
 
+(define ROUTE-0 (ws-route PATH-TEMP-0
+                          (list GET)
+                          (λ ()
+                            "Hello World Blank!")))
 (define ROUTE-1 (ws-route PATH-TEMP-1
+                          (list GET)
                           (λ ()
                             "Hello World 1!")))
 (define ROUTE-2 (ws-route PATH-TEMP-2
+                          (list GET)
                           (λ ()
                             "Hello World Long!")))
 (define ROUTE-3 (ws-route PATH-TEMP-3
+                          (list GET)
                           (λ (matched-string)
                             matched-string)))
 (define ROUTE-4 (ws-route PATH-TEMP-4
+                          (list GET)
                           (λ (matched-int)
                             (number->string matched-int))))
 (define ROUTE-5 (ws-route PATH-TEMP-5
+                          (list GET)
                           (λ (matched-string matched-int)
                             (string-append matched-string " " (number->string matched-int)))))
 (define ROUTE-6 (ws-route PATH-TEMP-7
+                          (list GET)
                           (λ (matched-string matched-int)
                             (string-append "Hello " matched-string "!"))))
 
+(define MATCHED-ROUTE-0 (ws-matched-route ROUTE-0 PATH-TEMP-0 '()))
 (define MATCHED-ROUTE-1 (ws-matched-route ROUTE-1 PATH-TEMP-1 '(exact exact)))
 (define MATCHED-ROUTE-2 (ws-matched-route ROUTE-1 PATH-TEMP-1 '(#false #false)))
 (define MATCHED-ROUTE-3 (ws-matched-route ROUTE-3 PATH-TEMP-3 '(param)))
