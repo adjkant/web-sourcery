@@ -3,11 +3,11 @@
 (provide best-matching-route
          parse-path-args)
 
-(require "../data-defs.rkt"
+(require "../data/defs.rkt"
          "../utils/basics.rkt")
 
 (module+ test (require "../utils/testing.rkt"
-                       "../data-conversion.rkt"))
+                       "../data/conversion.rkt"))
 
 
 ;; ---------------------------------------------------------------------------------------------------

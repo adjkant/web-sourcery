@@ -6,7 +6,7 @@
  create-cookie-getter)
 
 (require web-server/servlet
-         "../data-defs.rkt"
+         "../data/defs.rkt"
          "../utils/basics.rkt")
 
 (module+ test (require "../utils/testing.rkt"))

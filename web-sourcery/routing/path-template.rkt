@@ -4,7 +4,7 @@
          analagous-path-template?
          get-param-names)
 
-(require "../data-defs.rkt"
+(require "../data/defs.rkt"
          "../utils/basics.rkt")
 
 (module+ test (require "../utils/testing.rkt"))
@@ -13,9 +13,32 @@
 (define VALID-ROUTE-PARAM-TYPES (list "string" "int"))
 
 ;; PathTemplate PathTemplate -> Boolean
-;; determine if the two given path templates would match to the same route sets
+;; determine if the given path templates will match on least one path with the same priority
 (define (analagous-path-template? t1 t2)
-  #t)
+  (and (= (length t1) (length t2))
+       (andmap analagous-path-part? t1 t2)))
+
+(module+ test
+  (check-true (analagous-path-template? PATH-TEMP-1 PATH-TEMP-1))
+  (check-true (analagous-path-template? PATH-TEMP-4 PATH-TEMP-8))
+  (check-false (analagous-path-template? PATH-TEMP-1 PATH-TEMP-2))
+  (check-false (analagous-path-template? PATH-TEMP-3 PATH-TEMP-4))
+  (check-false (analagous-path-template? PATH-TEMP-5 PATH-TEMP-7)))
+
+;; PathPart PathPart -> Boolean
+;; determine if the given path template parts match with the same priority
+(define (analagous-path-part? pt1 pt2)
+  (or (and (string? pt1) (string? pt2) (string=? pt1 pt2))
+      (and (ws-route-param? pt1) (ws-route-param? pt2)
+           (symbol=? (ws-route-param-type pt1) (ws-route-param-type pt2)))))
+
+(module+ test
+  (check-true (analagous-path-part? ROUTE-PARAM-INT ROUTE-PARAM-INT))
+  (check-true (analagous-path-part? ROUTE-PARAM-INT ROUTE-PARAM-I1))
+  (check-true (analagous-path-part? "a" "a"))
+  (check-false (analagous-path-part? ROUTE-PARAM-INT ROUTE-PARAM-STR))
+  (check-false (analagous-path-part? ROUTE-PARAM-INT "basic"))
+  (check-false (analagous-path-part? "a" "b")))
 
 ;; String -> [Maybe PathTemplate]
 ;; convert a string into a PathTemplate or #false if any part is invalid

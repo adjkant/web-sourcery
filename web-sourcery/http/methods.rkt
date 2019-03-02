@@ -8,7 +8,7 @@
  method->symbol
  method->string)
 
-(require "../data-defs.rkt")
+(require "../data/defs.rkt")
 
 (module+ test (require rackunit))
 

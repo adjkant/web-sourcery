@@ -8,6 +8,8 @@
          (struct-out ws-req-path-part)
          (struct-out ws-matched-route)
          (struct-out ws-request)
+         (struct-out ws-response)
+         (struct-out ws-status)
          (struct-out ws-query-param)
          (struct-out ws-header)
          (struct-out ws-cookie))
@@ -18,7 +20,10 @@
 ;; A Route (ws-route PathTemplate [List-of Method] RouteHandler)
 (struct ws-route [path-temp methods handler] #:transparent)
 
-;; A RouteHandler is a [RouteArg ... [String -> [Maybe Header]] [String -> [Maybe Cookie]] -> String]
+;; A RouteHandler is a:
+;; [RouteArg ... [String -> [Maybe String]] [String -> [Maybe String]] [String -> [Maybe String]]
+;;  ->
+;;  Response]
 
 ;; PathTemplate is a [List-of PathPart]
 
@@ -52,7 +57,16 @@
 
 (struct ws-request [method path query-params headers cookies] #:transparent)
 ;; A Request is a
-;; (ws-request Method [List-of RequestPathPart] [List-of QueryParam [List-of Header] [List-of Cookie])
+;; (ws-request Method [List-of RequestPathPart]
+;;             [List-of QueryParam] [List-of Header] [List-of Cookie])
+
+(struct ws-response [data status])
+;; A Response is a (ws-response String StatusCode)
+
+(struct ws-status [code description])
+;; A StatusCode is a (ws-status-code Number String)
+;; where the number is a valid HTTP status code as defined at the following link:
+;; https://www.restapitutorial.com/httpstatuscodes.html
 
 (struct ws-method [m] #:transparent)
 ;; A Method is one of:

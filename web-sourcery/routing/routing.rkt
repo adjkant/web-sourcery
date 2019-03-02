@@ -7,10 +7,11 @@
          "path-template.rkt"
          "request-matching.rkt"
          "handler-inputs.rkt"
-         "../data-defs.rkt"
-         "../data-conversion.rkt"
+         "../data/defs.rkt"
+         "../data/conversion.rkt"
          "../utils/basics.rkt"
-         "../http/methods.rkt")
+         "../http/methods.rkt"
+         "../response/preset.rkt")
 
 (require (for-syntax syntax/parse
                      racket/syntax
@@ -18,22 +19,6 @@
                      "../utils/basics.rkt"))
 
 (module+ test (require "../utils/testing.rkt"))
-
-(define RESPONSE-404-ROUTE-NOT-FOUND
-  (response/full 404
-                 #"Not Found"
-                 (current-seconds)
-                 TEXT/HTML-MIME-TYPE
-                 '()
-                 (list (string->bytes/utf-8 "No Matching Route - 404 TODO"))))
-
-(define RESPONSE-400-BAD-REQUEST-NO-STRING-RETURN
-  (response/full 400
-                 #"Bad Request"
-                 (current-seconds)
-                 TEXT/HTML-MIME-TYPE
-                 '()
-                 (list (string->bytes/utf-8 "Route handler did not return a string"))))
 
 ;; Top Level Route Definition
 ;; TODO contacts on methods
@@ -78,44 +63,40 @@
 (define (add-route route-string route app)
   (define added-route-path-temp (ws-route-path-temp route))
   (define added-route-methods (ws-route-methods route))
-  (define duplicate-route?
-    (ormap
-     (λ (r)
-       (and (analagous-path-template? (ws-route-path-temp r) added-route-path-temp)
-            (map (λ (m) (member? m (ws-route-methods r))) added-route-methods))) 
-     app)) 
+  (define duplicate-route? (ormap (λ (r) (analagous-route? r route)) app))
   (if (not duplicate-route?)
       (cons route app)
-      (error 'duplicate-route (format "duplicate route at: ~s [~s]"
+      (error 'duplicate-route (format "at ~s [~s]"
                                       route-string
                                       (foldr (λ (ms acc) (string-append acc " " ms))
                                              (method->string (first added-route-methods))
                                              (map method->string (rest added-route-methods)))))))
 
+;; Route Route -> Boolean
+;; determine if the given routes will match over at least one request with with the same priority
+(define (analagous-route? r1 r2)
+  (and (analagous-path-template? (ws-route-path-temp r1) (ws-route-path-temp r2))
+       (ormap (λ (m) (member? m (ws-route-methods r1))) (ws-route-methods r2))))
+
+(module+ test
+  (check-true (analagous-route? ROUTE-1 ROUTE-1))
+  (check-true (analagous-route? ROUTE-4 ROUTE-7))
+  (check-false (analagous-route? ROUTE-1 ROUTE-4))
+  (check-false (analagous-route? ROUTE-2 ROUTE-5))
+  (check-false (analagous-route? ROUTE-7 ROUTE-8)))
+  
 
 ;; web-server/http/request WSApp -> web-server/http/response
 ;; Handle any request to the server and return an apropriate response
+;; testing here should be done at top level
 (define (handle-any-request req app)
   (define internal-req (request->ws-request req))
   (define matching-route (best-matching-route internal-req app))
   (if matching-route
-      (create-response (call-route-with-req matching-route internal-req))
-      RESPONSE-404-ROUTE-NOT-FOUND))
+      (ws-response->response (call-route-with-req matching-route internal-req))
+      DEFAULT-RESPONSE-404-ROUTE-NOT-FOUND))
 
-;; String -> web-server/http/response
-;; Create a response from the given string
-(define (create-response str)
-  (if (string? str)
-      (response/full 200
-                     #"Ok"
-                     (current-seconds)
-                     TEXT/HTML-MIME-TYPE
-                     '()
-                     (list (string->bytes/utf-8 str)))
-      RESPONSE-400-BAD-REQUEST-NO-STRING-RETURN))
-
-
-;; Route Request -> String
+;; Route Request -> Response
 ;; Call the given route's handler with the given request info
 ;; or create a 404 response if no route is given
 (define (call-route-with-req route req)

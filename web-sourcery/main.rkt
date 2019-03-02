@@ -3,12 +3,17 @@
 (provide define-web-sourcery-app
          define-route
          run-web-sourcery-app
-         GET GET? POST POST? PUT PUT? DELETE DELETE? method->symbol)
+         GET GET? POST POST? PUT PUT? DELETE DELETE? method->symbol
+         (rename-out [ws-response response]
+                     [ws-status custom-status])
+         (all-from-out "http/status-codes.rkt"))
 
 (require web-server/servlet
          web-server/servlet-env
          "routing/routing.rkt"
          "http/methods.rkt"
+         "http/status-codes.rkt"
+         "data/defs.rkt"
          (for-syntax syntax/parse
                      racket/syntax))
 

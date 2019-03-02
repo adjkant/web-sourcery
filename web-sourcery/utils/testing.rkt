@@ -12,7 +12,7 @@
  )
 
 (require rackunit
-         "../data-defs.rkt"
+         "../data/defs.rkt"
          "../http/methods.rkt"
          (for-syntax syntax/parse
                      rackunit))
@@ -84,6 +84,7 @@
 (define PATH-TEMP-5 (list ROUTE-PARAM-STR ROUTE-PARAM-INT))
 (define PATH-TEMP-6 (list ROUTE-PARAM-I1 ROUTE-PARAM-I2 ROUTE-PARAM-I3))
 (define PATH-TEMP-7 (list "hello" ROUTE-PARAM-STR))
+(define PATH-TEMP-8 (list ROUTE-PARAM-I1))
 
 (define ROUTE-0 (ws-route PATH-TEMP-0
                           (list GET)
@@ -113,6 +114,14 @@
                           (list GET)
                           (λ (matched-string matched-int)
                             (string-append "Hello " matched-string "!"))))
+(define ROUTE-7 (ws-route PATH-TEMP-8
+                          (list GET)
+                          (λ (matched-string matched-int)
+                            "got an int and calling it i")))
+(define ROUTE-8 (ws-route PATH-TEMP-8
+                          (list POST)
+                          (λ (matched-string matched-int)
+                            "got an int with a post and calling it i")))
 
 (define MATCHED-ROUTE-0 (ws-matched-route ROUTE-0 PATH-TEMP-0 '()))
 (define MATCHED-ROUTE-1 (ws-matched-route ROUTE-1 PATH-TEMP-1 '(exact exact)))

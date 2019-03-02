@@ -2,12 +2,15 @@
 
 (provide
  request->ws-request
+ ws-response->response
  strings->request-path)
 
 (require web-server/servlet
-         "data-defs.rkt")
+         "defs.rkt"
+         "../response/preset.rkt"
+         "../utils/basics.rkt")
 
-(module+ test (require "utils/testing.rkt"))
+(module+ test (require "../utils/testing.rkt"))
 
 ;; TODO testing - need request generation
 
@@ -22,13 +25,17 @@
    (request->ws-headers req)
    (request->ws-cookies req)))
 
-;; [List-of String] -> [List-of String]
-;; if the last string in the list is an empty string
-(define (trim-trailing-empty-string l)
-  (cond [(empty? l) '()]
-        [(empty? (rest l)) (if (string=? "" (first l)) '() l)]
-        [else (cons (first l) (trim-trailing-empty-string (rest l)))]))
-
+;; Response -> web-server/http/response
+;; Create a response from the given string
+(define (ws-response->response r)
+  (if (and (ws-response? r) (string? (ws-response-data r)))
+      (response/full (ws-status-code (ws-response-status r))
+                     (string->bytes/utf-8 (ws-status-description (ws-response-status r)))
+                     (current-seconds)
+                     TEXT/HTML-MIME-TYPE
+                     '()
+                     (list (string->bytes/utf-8 (ws-response-data r))))
+      RESPONSE-500-INVALID-RESPONSE))
 
 ;; String -> RequestPath
 ;; convert a string into a list of reuqest path parts
