@@ -16,7 +16,8 @@
 (require (for-syntax syntax/parse
                      racket/syntax
                      "path-template.rkt"
-                     "../utils/basics.rkt"))
+                     "../utils/basics.rkt"
+                     "../data/defs.rkt"))
 
 (module+ test (require "../utils/testing.rkt"))
 
@@ -24,7 +25,7 @@
 ;; TODO contacts on methods
 (define-syntax define-route
   (syntax-parser
-    [(_ [app-name:id path:string [method ...]] (~literal ->) type:id route-body)
+    [(_ [app-name:id path:string [method ...]] (~literal ->) response-type-syntax:id route-body)
      (define path-template (string->path-template (syntax->datum #'path)))
      (define param-names (get-param-names path-template))
      (define param-ids (map (λ (n) (format-id #'path "~a" n)) param-names))
@@ -33,7 +34,7 @@
                                 (format-id #'path "~a" "headers")
                                 (format-id #'path "~a" "cookies")))
      (define handler-inputs (append param-ids trailing-ids))
-     (define response-type (syntax->datum #'id))
+     (define response-type (syntax->datum #'response-type-syntax))
      
      (unless path-template
        (raise-syntax-error
@@ -44,7 +45,7 @@
        (raise-syntax-error
         'define-route
         (format "duplicate path parameter names in \"~s\"" (syntax->datum #'path))))
-
+     
      (unless (member? response-type VALID-RESPONSE-TYPES)
        (raise-syntax-error
         'define-route
@@ -55,14 +56,9 @@
              (add-route path
                         (ws-route (string->path-template path)
                                   (list method ...)
-                                  #,response-type
+                                  (string->symbol #,(symbol->string response-type))
                                   (lambda #,handler-inputs route-body))
                         app-name))]))
-
-(module+ test
-  (check-compile-error 
-   (define-route [app "/<int:param>/<string:param>" [GET]] -> TEXT
-     (session-path (session-create "blank")))))
 
 ;; String Route WSApp
 ;; adds a route while throwing an error if the route path would be a duplicate

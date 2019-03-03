@@ -17,7 +17,7 @@
 ;; Define Routes
 ;; ---------------------------------------------------
 
-(define-route [app "" [GET]] -> TEX
+(define-route [app "" [GET]] -> TEXT
   (response (session-path (session-create "blank GET"))
             201-CREATED))
 

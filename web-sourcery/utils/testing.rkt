@@ -88,38 +88,47 @@
 
 (define ROUTE-0 (ws-route PATH-TEMP-0
                           (list GET)
+                          'TEXT
                           (λ ()
                             "Hello World Blank!")))
 (define ROUTE-1 (ws-route PATH-TEMP-1
                           (list GET)
+                          'TEXT
                           (λ ()
                             "Hello World 1!")))
 (define ROUTE-2 (ws-route PATH-TEMP-2
                           (list GET)
+                          'TEXT
                           (λ ()
                             "Hello World Long!")))
 (define ROUTE-3 (ws-route PATH-TEMP-3
                           (list GET)
+                          'TEXT
                           (λ (matched-string)
                             matched-string)))
 (define ROUTE-4 (ws-route PATH-TEMP-4
                           (list GET)
+                          'TEXT
                           (λ (matched-int)
                             (number->string matched-int))))
 (define ROUTE-5 (ws-route PATH-TEMP-5
                           (list GET)
+                          'TEXT
                           (λ (matched-string matched-int)
                             (string-append matched-string " " (number->string matched-int)))))
 (define ROUTE-6 (ws-route PATH-TEMP-7
                           (list GET)
+                          'TEXT
                           (λ (matched-string matched-int)
                             (string-append "Hello " matched-string "!"))))
 (define ROUTE-7 (ws-route PATH-TEMP-8
                           (list GET)
+                          'TEXT
                           (λ (matched-string matched-int)
                             "got an int and calling it i")))
 (define ROUTE-8 (ws-route PATH-TEMP-8
                           (list POST)
+                          'TEXT
                           (λ (matched-string matched-int)
                             "got an int with a post and calling it i")))
 
