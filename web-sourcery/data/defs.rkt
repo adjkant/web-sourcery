@@ -9,6 +9,7 @@
          (struct-out ws-matched-route)
          (struct-out ws-request)
          (struct-out ws-response)
+         VALID-RESPONSE-TYPES
          (struct-out ws-status)
          (struct-out ws-query-param)
          (struct-out ws-header)
@@ -17,8 +18,8 @@
 
 ;; A WSApp is a [List-of Route]
 
-;; A Route (ws-route PathTemplate [List-of Method] RouteHandler)
-(struct ws-route [path-temp methods handler] #:transparent)
+;; A Route (ws-route PathTemplate [List-of Method] ResponseType RouteHandler)
+(struct ws-route [path-temp methods response-type handler] #:transparent)
 
 ;; A RouteHandler is a:
 ;; [RouteArg ... [String -> [Maybe String]] [String -> [Maybe String]] [String -> [Maybe String]]
@@ -62,6 +63,12 @@
 
 (struct ws-response [data status])
 ;; A Response is a (ws-response String StatusCode)
+
+;; A ResponseType is one of:
+;; - 'TEXT
+;; - 'JSON
+
+(define VALID-RESPONSE-TYPES '(TEXT JSON))
 
 (struct ws-status [code description])
 ;; A StatusCode is a (ws-status-code Number String)

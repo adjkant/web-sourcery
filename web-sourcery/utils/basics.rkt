@@ -2,6 +2,7 @@
 
 (provide member?
          duplicates?
+         zip
          trim-trailing-empty-string
          when/f)
 
@@ -19,6 +20,12 @@
   (cond [(empty? xs) #f]
         [(cons? xs) (or (member? (first xs) (rest xs))
                         (duplicates? (rest xs)))]))
+
+
+;; [List-of X] [List-of Y] -> [List-of (list X Y)]
+;; zip two equal sized lists together, erroring if the lists are not equal
+(define (zip l1 l2)
+  (map list l1 l2))
 
 
 ;; [List-of String] -> [List-of String]

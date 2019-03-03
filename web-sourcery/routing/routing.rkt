@@ -24,7 +24,7 @@
 ;; TODO contacts on methods
 (define-syntax define-route
   (syntax-parser
-    [(_ [app-name:id path:string [method ...]] route-body)
+    [(_ [app-name:id path:string [method ...]] (~literal ->) type:id route-body)
      (define path-template (string->path-template (syntax->datum #'path)))
      (define param-names (get-param-names path-template))
      (define param-ids (map (λ (n) (format-id #'path "~a" n)) param-names))
@@ -33,29 +33,35 @@
                                 (format-id #'path "~a" "headers")
                                 (format-id #'path "~a" "cookies")))
      (define handler-inputs (append param-ids trailing-ids))
+     (define response-type (syntax->datum #'id))
      
      (unless path-template
        (raise-syntax-error
         'define-route
-        (string-append "invalid path template syntax in \"" (syntax->datum #'path) "\"")))
+        (format "invalid path template syntax in \"~s\"" (syntax->datum #'path))))
 
      (when (duplicates? param-names)
        (raise-syntax-error
         'define-route
-        (string-append "duplicate path parameter names in \"" (syntax->datum #'path) "\"")))
+        (format "duplicate path parameter names in \"~s\"" (syntax->datum #'path))))
 
+     (unless (member? response-type VALID-RESPONSE-TYPES)
+       (raise-syntax-error
+        'define-route
+        (format "invalid handler response type: ~s" response-type)))
      
      
      #`(set! app-name
              (add-route path
                         (ws-route (string->path-template path)
                                   (list method ...)
+                                  #,response-type
                                   (lambda #,handler-inputs route-body))
                         app-name))]))
 
 (module+ test
   (check-compile-error 
-   (define-route [app "/<int:param>/<string:param>" [GET]]
+   (define-route [app "/<int:param>/<string:param>" [GET]] -> TEXT
      (session-path (session-create "blank")))))
 
 ;; String Route WSApp

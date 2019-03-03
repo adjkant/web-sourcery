@@ -4,7 +4,7 @@
          define-route
          run-web-sourcery-app
          GET GET? POST POST? PUT PUT? DELETE DELETE? method->symbol
-         (rename-out [ws-response response]
+         (rename-out [user-response response]
                      [ws-status custom-status])
          (all-from-out "http/status-codes.rkt"))
 
@@ -14,6 +14,7 @@
          "http/methods.rkt"
          "http/status-codes.rkt"
          "data/defs.rkt"
+         "response/response.rkt"
          (for-syntax syntax/parse
                      racket/syntax))
 
