@@ -11,6 +11,7 @@
          "../data/conversion.rkt"
          "../utils/basics.rkt"
          "../http/methods.rkt"
+         "../response/response.rkt"
          "../response/preset.rkt")
 
 (require (for-syntax syntax/parse
@@ -95,21 +96,24 @@
   (define internal-req (request->ws-request req))
   (define matching-route (best-matching-route internal-req app))
   (if matching-route
-      (ws-response->response (call-route-with-req matching-route internal-req))
+      (call-route-with-req matching-route internal-req)
       DEFAULT-RESPONSE-404-ROUTE-NOT-FOUND))
 
-;; Route Request -> Response
-;; Call the given route's handler with the given request info
-;; or create a 404 response if no route is given
+;; Route Request -> web-server/http/response
+;; Call the given route's handler with the given request info and convert the response to an external
+;; format, producing an error response if the handler does not return a proper value
 (define (call-route-with-req route req)
+  (define response-type (ws-route-response-type route))
   (define path-params (parse-path-args (ws-request-path req) (ws-route-path-temp route)))
-  (define handler-request-inputs
-    (list (ws-request-method req)
-          (create-query-param-getter (ws-request-query-params req))
-          (create-header-getter (ws-request-headers req))
-          (create-cookie-getter (ws-request-cookies req))))
-  (apply (ws-route-handler route)
-         (append path-params handler-request-inputs)))
+  (define automatic-handler-inputs (list (ws-request-method req)
+                                         (create-query-param-getter (ws-request-query-params req))
+                                         (create-header-getter (ws-request-headers req))
+                                         (create-cookie-getter (ws-request-cookies req))))
+  (define handler-inputs (append path-params automatic-handler-inputs))
+  (define response (apply (ws-route-handler route) handler-inputs))
+  (if (valid-response? response response-type)
+      (ws-response->response response response-type)
+      RESPONSE-500-INVALID-RESPONSE))
 
 
 (module+ test

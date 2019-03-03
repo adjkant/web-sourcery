@@ -20,3 +20,16 @@
 (define 500-INTERNAL-ERROR      (ws-status 500 "TODO"))
 (define 501-NOT-IMPLEMENTED     (ws-status 501 "TODO"))
 (define 503-UNAVAILABLE         (ws-status 503 "TODO"))
+
+(module+ test (require rackunit))
+
+(define (valid-response-status? s)
+  (and (ws-status? s)
+       (>= 599 (ws-status-code s) 100)))
+
+(module+ test
+  (check-true (valid-response-status? 200-OK))
+  (check-true (valid-response-status? 400-BAD-REQUEST))
+  (check-true (valid-response-status? (ws-status 111 "Make a Wish")))
+  (check-false (valid-response-status? (ws-status 1 "Make a Wish")))
+  (check-false (valid-response-status? 200)))

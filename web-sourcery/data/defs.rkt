@@ -61,8 +61,16 @@
 ;; (ws-request Method [List-of RequestPathPart]
 ;;             [List-of QueryParam] [List-of Header] [List-of Cookie])
 
-(struct ws-response [data status])
-;; A Response is a (ws-response String StatusCode)
+(struct ws-response [data status] #:transparent)
+;; A Response is a (ws-response ResponseData StatusCode)
+
+;; A ResponseData is one of:
+;; - String
+;; - WSJSONExpr
+
+;; A WSJSONExpr is an expression that either:
+;; - passes jsexpr?
+;; - passes a predicate for a given serializer and all parts recursivly are WSJSONExpr
 
 ;; A ResponseType is one of:
 ;; - 'TEXT
@@ -70,7 +78,7 @@
 
 (define VALID-RESPONSE-TYPES '(TEXT JSON))
 
-(struct ws-status [code description])
+(struct ws-status [code description] #:transparent)
 ;; A StatusCode is a (ws-status-code Number String)
 ;; where the number is a valid HTTP status code as defined at the following link:
 ;; https://www.restapitutorial.com/httpstatuscodes.html

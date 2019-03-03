@@ -6,8 +6,9 @@
  strings->request-path)
 
 (require web-server/servlet
+         json
          "defs.rkt"
-         "../response/preset.rkt"
+         "../response/response.rkt"
          "../utils/basics.rkt")
 
 (module+ test (require "../utils/testing.rkt"))
@@ -25,17 +26,28 @@
    (request->ws-headers req)
    (request->ws-cookies req)))
 
-;; Response -> web-server/http/response
-;; Create a response from the given string
-(define (ws-response->response r)
-  (if (and (ws-response? r) (string? (ws-response-data r)))
-      (response/full (ws-status-code (ws-response-status r))
-                     (string->bytes/utf-8 (ws-status-description (ws-response-status r)))
-                     (current-seconds)
-                     TEXT/HTML-MIME-TYPE
-                     '()
-                     (list (string->bytes/utf-8 (ws-response-data r))))
-      RESPONSE-500-INVALID-RESPONSE))
+;; Response ResponseType -> web-server/http/response
+;; Create an external response for a Response that passes the valid-response? predicate
+(define (ws-response->response r t)
+  (define response-data-bytes (ws-response-data->bytes (ws-response-data r)))
+  (response/full (ws-status-code (ws-response-status r))
+                 (string->bytes/utf-8 (ws-status-description (ws-response-status r)))
+                 (current-seconds)
+                 (ws-response-type->response-type t)
+                 ALL-RESPONSE-HEADERS
+                 (list response-data-bytes)))
+
+
+;; ResponseType -> Bytes
+(define (ws-response-type->response-type rt)
+  (cond [(symbol=? rt 'TEXT) TEXT/HTML-MIME-TYPE]
+        [(symbol=? rt 'JSON) JSON-MIME-TYPE]))
+
+;; ResponseData -> Bytes
+(define (ws-response-data->bytes rd)
+  (cond [(string? rd) (string->bytes/utf-8 rd)]
+        [else (jsexpr->bytes rd)]))
+
 
 ;; String -> RequestPath
 ;; convert a string into a list of reuqest path parts

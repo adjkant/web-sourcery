@@ -22,8 +22,10 @@
             201-CREATED))
 
 (define-route [app "/json-output-basic" [GET]] -> JSON
-  (response (list 1 2 3)
-                 200-OK))
+  (response (list 1 2 3) 200-OK))
+
+(define-route [app "/json-output-invalid" [GET]] -> TEXT
+  (response (list 1 2 3) 200-OK))
 
 (define-route [app "" [POST]] -> TEXT
   (response (session-path (session-create "blank POST")) 201-CREATED))
