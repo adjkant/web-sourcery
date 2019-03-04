@@ -1,13 +1,14 @@
 #lang racket
 
-(provide member?
-         duplicates?
-         zip
-         trim-trailing-empty-string
-         when/f)
+(provide (all-defined-out))
 
 (require (for-syntax syntax/parse
                      racket/syntax))
+
+;; [Syntax-of Id] -> String
+;; Convert an identifier to a string
+(define (id->string id)
+  (symbol->string (syntax-e id)))
 
 ;; Any [List-of Any] -> Boolean
 ;; Determine if the given item exists in the given list

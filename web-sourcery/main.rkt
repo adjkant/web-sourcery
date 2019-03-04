@@ -6,7 +6,8 @@
          GET GET? POST POST? PUT PUT? DELETE DELETE? method->symbol
          (rename-out [user-response response]
                      [ws-status custom-status])
-         (all-from-out "http/status-codes.rkt"))
+         (all-from-out "http/status-codes.rkt")
+         json-serializer json-serializer-struct)
 
 (require web-server/servlet
          web-server/servlet-env
@@ -15,6 +16,7 @@
          "http/status-codes.rkt"
          "data/defs.rkt"
          "response/response.rkt"
+         "json/serializers.rkt"
          (for-syntax syntax/parse
                      racket/syntax))
 
@@ -44,7 +46,8 @@
     [(_ app-name
         (~alt (~optional (~seq #:port port:integer)       #:defaults ([port #'DEFAULT-PORT]))
               (~optional (~seq #:cors? cors?:boolean)     #:defaults ([cors? #'DEFAULT-CORS?]))
-              (~optional (~seq #:public? public?:boolean) #:defaults ([public? #'DEFAULT-PUBLIC?])))
+              (~optional (~seq #:public? public?:boolean) #:defaults ([public? #'DEFAULT-PUBLIC?]))
+              (~optional (~seq #:json-serializers serializers) #:defaults ([serializers '()])))
         ...)
      #'(serve/servlet #:port port
                       #:command-line? #t

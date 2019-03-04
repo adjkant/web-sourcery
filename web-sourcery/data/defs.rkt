@@ -13,7 +13,8 @@
          (struct-out ws-status)
          (struct-out ws-query-param)
          (struct-out ws-header)
-         (struct-out ws-cookie))
+         (struct-out ws-cookie)
+         (struct-out ws-json-serializer))
 
 
 ;; A WSApp is a [List-of Route]
@@ -98,3 +99,6 @@
 
 (struct ws-cookie [name value] #:transparent)
 ;; A Cookie is a (ws-header String String)
+
+(struct ws-json-serializer [predicate fields] #:transparent)
+;; A JSONSerializer is a (ws-json-serializer [X -> Boolean] (list String [Y -> WSJSONExpr])

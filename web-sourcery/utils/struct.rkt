@@ -1,7 +1,8 @@
 #lang racket
 
+(provide struct-named-accessors)
+
 (require syntax/parse
-         sql-sourcery
          racket/syntax
          "basics.rkt")
 
@@ -29,7 +30,8 @@
   (syntax-parser
     [(_ maybe-struct)
      #'(when/f (struct? maybe-struct)
-               (let-values ([(name i g n o r e !) (struct-type-info (let-values ([(s _) (struct-info maybe-struct)]) s))])
+               (let-values ([(name i g n o r e !)
+                             (struct-type-info (let-values ([(s _) (struct-info maybe-struct)]) s))])
                  name))]))
 
 (define-syntax symbol->id
@@ -43,17 +45,17 @@
 
 ;; Testing by example
 
-(struct example [x ys] #:transparent)
+#;(struct example [x ys] #:transparent)
 ;(struct namee [x ys] #:transparent)
-(struct sub example [x y])
+#;(struct sub example [x y])
 
 #;(get-struct-type-id 1)
 #;(define struct-sym (get-struct-type-id (example 1 2)))
 #;struct-sym
 
-(sourcery-db "test.db")
-(sourcery-struct x [(path STRING)])
+#;(sourcery-db "test.db")
+#;(sourcery-struct x [(path STRING)])
 
-(struct-named-accessors example)
-(struct-named-accessors sub)
+#;(struct-named-accessors example)
+#;(struct-named-accessors sub)
 #;(struct-named-accessors x)

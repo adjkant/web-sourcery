@@ -10,6 +10,19 @@
 (sourcery-struct session [(path STRING)])
 (sourcery-struct data [(field STRING) (timestamp INTEGER)])
 
+(struct basic-structure [some data here])
+
+(define basic-structure-serializer (json-serializer-struct basic-structure))
+
+(define data-custom-serializer
+  (json-serializer basic-structure?
+                   (some     basic-structure-some)
+                   (data      basic-structure-data)))
+
+#;(define session-serializer (json-serializer-sourcery-struct session))
+
+(define serializers (list basic-structure-serializer #;session-serializer data-custom-serializer))
+
 ;; Define an application
 (define-web-sourcery-app app)
 
@@ -23,6 +36,9 @@
 
 (define-route [app "/json-output-basic" [GET]] -> JSON
   (response (list 1 2 3) 200-OK))
+
+(define-route [app "/json-output-struct" [GET]] -> JSON
+  (response (basic-structure 1 2 3) 200-OK))
 
 (define-route [app "/json-output-invalid" [GET]] -> TEXT
   (response (list 1 2 3) 200-OK))
@@ -89,6 +105,7 @@
 ;; ---------------------------------------------------
 
 ;; Run Application from a custom port
-(run-web-sourcery-app app
-                      #:cors? #t
-                      #:port 1000)
+#;(run-web-sourcery-app app
+                        #:json-serializers serializers
+                        #:cors? #t
+                        #:port 1000)
