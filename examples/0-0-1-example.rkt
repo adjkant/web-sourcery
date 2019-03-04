@@ -35,8 +35,7 @@
 ;; ---------------------------------------------------
 
 (define-route [app "" [GET]] -> TEXT
-  (response (session-path (session-create "blank GET"))
-            201-CREATED))
+  (response (session-path (session-create "blank GET")) 201-CREATED))
 
 (define-route [app "/json-output-basic" [GET]] -> JSON
   (response (json-obj (json-kv 'values (list 1 2 3))) 200-OK))
