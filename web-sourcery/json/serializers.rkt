@@ -19,7 +19,9 @@
   (syntax-parser
     [(_ predicate (field:id getter:id) ...)
      (define field-strings (cons list (map id->string (syntax->list #'(field ...)))))
-     #`(ws-json-serializer predicate (zip #,field-strings (list getter ...)))]))
+     #`(ws-json-serializer predicate
+                           (zip (map string->symbol #,field-strings)
+                                (list getter ...)))]))
 
 (define-syntax json-serializer-struct
   (syntax-parser

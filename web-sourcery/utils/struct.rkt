@@ -11,20 +11,26 @@
                      syntax/parse/class/struct-id
                      racket/syntax))
 
+;; [Id-of Struct] -> [Maybe [List-of Symbol]]
 (define-syntax struct-field-names
   (syntax-parser
     [(_ id:struct-id)
      #'(when/f #true #;(and (boolean? id.supertype-id) id.supertype-id) ; TODO
                (let [(struct-name-length (add1 (string-length (symbol->string 'id))))]
-                 (map (λ (a) (substring (symbol->string a) struct-name-length))
-                      (list 'id.accessor-id ...))))]))
+                 (map string->symbol
+                      (map (λ (a) (substring (symbol->string a) struct-name-length))
+                           (list 'id.accessor-id ...)))))]))
 
+;; [Id-of Struct] -> [Maybe [List-of (list Symbol [Struct -> Any])]]
 (define-syntax struct-named-accessors
   (syntax-parser
     [(_ id:struct-id)
      #'(let [(field-names (struct-field-names id))]
          (when/f field-names
                  (zip field-names (list id.accessor-id ...))))]))
+
+
+;; Scratchwork
 
 (define-syntax get-struct-type-id
   (syntax-parser

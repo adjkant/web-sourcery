@@ -9,7 +9,8 @@
          json
          "defs.rkt"
          "../response/response.rkt"
-         "../utils/basics.rkt")
+         "../utils/basics.rkt"
+         "../json/json.rkt")
 
 (module+ test (require "../utils/testing.rkt"))
 
@@ -26,10 +27,10 @@
    (request->ws-headers req)
    (request->ws-cookies req)))
 
-;; Response ResponseType -> web-server/http/response
+;; Response ResponseType [List-of JSONSerializer] -> web-server/http/response
 ;; Create an external response for a Response that passes the valid-response? predicate
-(define (ws-response->response r t)
-  (define response-data-bytes (ws-response-data->bytes (ws-response-data r)))
+(define (ws-response->response r t serializers)
+  (define response-data-bytes (ws-response-data->bytes (ws-response-data r) serializers))
   (response/full (ws-status-code (ws-response-status r))
                  (string->bytes/utf-8 (ws-status-description (ws-response-status r)))
                  (current-seconds)
@@ -44,9 +45,9 @@
         [(symbol=? rt 'JSON) JSON-MIME-TYPE]))
 
 ;; ResponseData -> Bytes
-(define (ws-response-data->bytes rd)
+(define (ws-response-data->bytes rd serializers)
   (cond [(string? rd) (string->bytes/utf-8 rd)]
-        [else (jsexpr->bytes rd)]))
+        [else (jsexpr->bytes (serialize-json rd serializers))]))
 
 
 ;; String -> RequestPath

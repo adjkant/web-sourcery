@@ -89,20 +89,20 @@
   (check-false (analagous-route? ROUTE-7 ROUTE-8)))
   
 
-;; web-server/http/request WSApp -> web-server/http/response
+;; web-server/http/request WSApp [List-of JSONSerializer] -> web-server/http/response
 ;; Handle any request to the server and return an apropriate response
 ;; testing here should be done at top level
-(define (handle-any-request req app)
+(define (handle-any-request req app serializers)
   (define internal-req (request->ws-request req))
   (define matching-route (best-matching-route internal-req app))
   (if matching-route
-      (call-route-with-req matching-route internal-req)
+      (call-route-with-req matching-route internal-req serializers)
       DEFAULT-RESPONSE-404-ROUTE-NOT-FOUND))
 
-;; Route Request -> web-server/http/response
+;; Route Request [List-of JSONSerializer] -> web-server/http/response
 ;; Call the given route's handler with the given request info and convert the response to an external
 ;; format, producing an error response if the handler does not return a proper value
-(define (call-route-with-req route req)
+(define (call-route-with-req route req serializers)
   (define response-type (ws-route-response-type route))
   (define path-params (parse-path-args (ws-request-path req) (ws-route-path-temp route)))
   (define automatic-handler-inputs (list (ws-request-method req)
@@ -111,8 +111,8 @@
                                          (create-cookie-getter (ws-request-cookies req))))
   (define handler-inputs (append path-params automatic-handler-inputs))
   (define response (apply (ws-route-handler route) handler-inputs))
-  (if (valid-response? response response-type)
-      (ws-response->response response response-type)
+  (if (valid-response? response response-type serializers)
+      (ws-response->response response response-type serializers)
       RESPONSE-500-INVALID-RESPONSE))
 
 

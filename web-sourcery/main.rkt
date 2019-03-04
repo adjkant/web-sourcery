@@ -7,6 +7,7 @@
          (rename-out [user-response response]
                      [ws-status custom-status])
          (all-from-out "http/status-codes.rkt")
+         json-obj json-kv
          json-serializer json-serializer-struct)
 
 (require web-server/servlet
@@ -16,6 +17,7 @@
          "http/status-codes.rkt"
          "data/defs.rkt"
          "response/response.rkt"
+         "json/json.rkt"
          "json/serializers.rkt"
          (for-syntax syntax/parse
                      racket/syntax))
@@ -55,7 +57,7 @@
                       #:listen-ip public?
                       #:stateless? #t
                       (λ (req)
-                        (handle-any-request req app-name)))]))
+                        (handle-any-request req app-name serializers)))]))
 
 (module+ test
   (check-compile-error (begin
