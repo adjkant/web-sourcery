@@ -29,7 +29,7 @@ WebSourcery will also include a testing library to make simulating requests easy
 - [x] Port Specification
 - [x] Local Connections Only T/F
 - [ ] CORS Support
-- [ ] Statefulness Decisions
+- [x] Statefulness Decisions
 
 ##### Request Inputs
 - [x] Route
@@ -39,8 +39,8 @@ WebSourcery will also include a testing library to make simulating requests easy
 - [ ] POST Data
 
 ##### Request Outputs
-- [ ] Status Codes
-- [ ] Return Types (JSON, HTML, Plaintext, ...?)
+- [x] Status Codes
+- [x] Return Types (JSON, HTML, Plaintext, ...?)
 - [ ] Headers
 - [ ] Cookies
 
@@ -52,7 +52,7 @@ WebSourcery will also include a testing library to make simulating requests easy
 
 ##### JSON
 - [ ] Input JSON Parsing (POST data)
-- [ ] Output JSON Automation
+- [x] Output JSON Automation
 
 ##### Static Files
 - [ ] Single Folder / Convention
