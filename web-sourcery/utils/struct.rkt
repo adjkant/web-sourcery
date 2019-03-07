@@ -11,11 +11,15 @@
                      syntax/parse/class/struct-id
                      racket/syntax))
 
+(define-for-syntax (tee x)
+  (displayln x)
+  x)
+
 ;; [Id-of Struct] -> [Maybe [List-of Symbol]]
 (define-syntax struct-field-names
   (syntax-parser
     [(_ id:struct-id)
-     #'(when/f #true #;(and (boolean? id.supertype-id) id.supertype-id) ; TODO
+     #`(when/f #,(and (boolean? (syntax-e #'id.supertype-id)) (syntax-e #'id.supertype-id))
                (let [(struct-name-length (add1 (string-length (symbol->string 'id))))]
                  (map string->symbol
                       (map (λ (a) (substring (symbol->string a) struct-name-length))

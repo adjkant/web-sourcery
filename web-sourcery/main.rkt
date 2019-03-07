@@ -57,7 +57,9 @@
                       #:listen-ip public?
                       #:stateless? #t
                       (λ (req)
-                        (handle-any-request req app-name serializers)))]))
+                        (begin
+                          #;(displayln (request-post-data/raw req))
+                          (handle-any-request req app-name serializers))))]))
 
 (module+ test
   (check-compile-error (begin

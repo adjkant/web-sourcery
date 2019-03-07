@@ -11,12 +11,15 @@
 (sourcery-struct data [(field STRING) (timestamp INTEGER)])
 
 (struct basic-structure [here some data] #:transparent)
+#;(struct sub basic-structure [])
+
+#;(json-serializer-struct sub)
 
 (define basic-structure-serializer (json-serializer-struct basic-structure))
 
 (define data-custom-serializer
   (json-serializer basic-structure?
-                   (some     basic-structure-some)
+                   (some      basic-structure-some)
                    (data      basic-structure-data)))
 #;(define data-custom-serializer-2
   (json-serializer string? #;data?
@@ -25,7 +28,7 @@
 
 #;(define session-serializer (json-serializer-sourcery-struct session))
 
-(define serializers (list basic-structure-serializer #;session-serializer data-custom-serializer))
+(define serializers (list #;basic-structure-serializer #;session-serializer data-custom-serializer))
 
 ;; Define an application
 (define-web-sourcery-app app)
@@ -39,6 +42,12 @@
 
 (define-route [app "/json-output-basic" [GET]] -> JSON
   (response (json-obj (json-kv 'values (list 1 2 3))) 200-OK))
+
+#;(define-route [app "/accept-json" [GET POST]] -> JSON
+  (response (some-func) 200-OK))
+
+#;(define-route [app "/return-cookie(and-header)" [GET]] -> TEXT
+  (with-cookies (response "" 200-OK) created-cookies))
 
 (define-route [app "/json-output-struct" [GET]] -> JSON
   (response (basic-structure 1 2 3) 200-OK))

@@ -48,6 +48,5 @@
 
 
 ;; way to more clearly pair JSON values
-(define-syntax json-kv
-  (syntax-parser
-    [(_ k v) #'(list k v)]))
+(define (json-kv k v)
+    (list k v))

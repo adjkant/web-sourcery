@@ -27,4 +27,7 @@
   (syntax-parser
     [(_ s:struct-id)
      (define struct-predicate (format-id #'s "~a?" (syntax-e #'s)))
-     #`(ws-json-serializer #,struct-predicate (struct-named-accessors s))]))
+     #`(let [(named-accessors-list (struct-named-accessors s))]
+         (if named-accessors-list
+             (ws-json-serializer #,struct-predicate named-accessors-list)
+             (error 'TODO-ERROR "cannot serialize a subtyped strcture automatically ~a" s)))]))
