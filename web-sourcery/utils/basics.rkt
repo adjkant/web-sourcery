@@ -5,6 +5,12 @@
 (require (for-syntax syntax/parse
                      racket/syntax))
 
+
+;; Any -> Any
+;; displayln and return any value
+(define (tee x)
+  (displayln x) x)
+
 ;; [Syntax-of Id] -> String
 ;; Convert an identifier to a string
 (define (id->string id)
@@ -28,7 +34,6 @@
 (define (zip l1 l2)
   (map list l1 l2))
 
-
 ;; [List-of String] -> [List-of String]
 ;; if the last string in the list is an empty string
 (define (trim-trailing-empty-string l)
@@ -36,6 +41,8 @@
         [(empty? (rest l)) (if (string=? "" (first l)) '() l)]
         [else (cons (first l) (trim-trailing-empty-string (rest l)))]))
 
+;; Boolean Any -> Any U #false
+;; return a value if a condition is true, otherwise false
 (define-syntax when/f
   (syntax-parser
     [(_ condition if-true) #'(if condition if-true #false)]))

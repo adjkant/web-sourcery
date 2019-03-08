@@ -11,10 +11,6 @@
                      syntax/parse/class/struct-id
                      racket/syntax))
 
-(define-for-syntax (tee x)
-  (displayln x)
-  x)
-
 ;; [Id-of Struct] -> [Maybe [List-of Symbol]]
 (define-syntax struct-field-names
   (syntax-parser
@@ -32,40 +28,3 @@
      #'(let [(field-names (struct-field-names id))]
          (when/f field-names
                  (zip field-names (list id.accessor-id ...))))]))
-
-
-;; Scratchwork
-
-(define-syntax get-struct-type-id
-  (syntax-parser
-    [(_ maybe-struct)
-     #'(when/f (struct? maybe-struct)
-               (let-values ([(name i g n o r e !)
-                             (struct-type-info (let-values ([(s _) (struct-info maybe-struct)]) s))])
-                 name))]))
-
-(define-syntax symbol->id
-  (syntax-parser
-    [(_ s)
-     (define a (string-append "example"#;(symbol->string (syntax-e #'s)) "!"))
-     (define b (substring a 0 (- (string-length a) 2)))
-     (define c (substring a (string-length b) (sub1 (string-length a))))
-     (define d (format-id #'s "~a~a" b c))
-     #`(struct-named-accessors s)]))
-
-;; Testing by example
-
-#;(struct example [x ys] #:transparent)
-;(struct namee [x ys] #:transparent)
-#;(struct sub example [x y])
-
-#;(get-struct-type-id 1)
-#;(define struct-sym (get-struct-type-id (example 1 2)))
-#;struct-sym
-
-#;(sourcery-db "test.db")
-#;(sourcery-struct x [(path STRING)])
-
-#;(struct-named-accessors example)
-#;(struct-named-accessors sub)
-#;(struct-named-accessors x)

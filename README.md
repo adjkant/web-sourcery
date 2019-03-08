@@ -8,7 +8,7 @@ In conjunction with [SQLSourcery](https://github.com/adjkant/sql-sourcery), it i
 
 WebSourcery is focused on server side computation but will also accommodate serving static files as well as rendering HTML templates. Native JSON support will allow for seamless Racket programming to translate into sensical JSON with little to no programmer effort. Each endpoint can be defined with routes including route parameters and complex route pattern matching. Static files can be served from an individual route or served from a folder like route.
 
-SQLSourcery will allow for structures to be easily mapped, loaded, and saved to a database without the use of SQL. The intent is to allow functional programmers to easily write functional code with persistency and avoid boilerplate needed to provide basic persistency.
+[SQLSourcery](https://github.com/adjkant/sql-sourcery) will allow for structures to be easily mapped, loaded, and saved to a database without the use of SQL. The intent is to allow functional programmers to easily write functional code with persistency and avoid boilerplate needed to provide basic persistency.
 
 WebSourcery will also include a testing library to make simulating requests easy and will also be able to integrate with [SQLSourcery](https://github.com/adjkant/sql-sourcery) to test persistency.
 
@@ -59,9 +59,9 @@ WebSourcery will also include a testing library to make simulating requests easy
 - [ ] Default Static Folder
 
 ##### Testing
-- [ ] Quick Request Creation Shortcuts
-- [ ] Simulated Router/Handler Calls
-- [ ] JSON Testing (riposte - german company?)
+- [x] Quick Request Creation Shortcuts
+- [x] Simulated Router/Handler Calls
+- [x] JSON Testing
 - [ ] HTML Template Testing
 
 ##### HTML Templating (Using Formlets)

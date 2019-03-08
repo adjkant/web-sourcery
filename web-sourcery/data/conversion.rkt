@@ -4,6 +4,8 @@
  request->ws-request
  internal-response->external-response
  response-error-code->response
+ response-error-code->string
+ response-error-code->status
  strings->request-path)
 
 (require web-server/servlet
@@ -11,6 +13,7 @@
          "defs.rkt"
          "../response/response.rkt"
          "../response/preset.rkt"
+         "../http/status-codes.rkt"
          "../utils/basics.rkt"
          "../json/json.rkt")
 
@@ -55,10 +58,28 @@
 ;; ResponseErrorCode -> web-server/http/response
 ;; convert an internal handler error code into an external response
 (define (response-error-code->response error-code)
-  (cond
-    [(= error-code 404) DEFAULT-RESPONSE-404-ROUTE-NOT-FOUND]
-    [(= error-code 500) RESPONSE-500-INVALID-RESPONSE]))
+  (define response-status (response-error-code->status error-code))
+  (define error-string (response-error-code->string error-code))
+  (response/full (ws-status-code response-status)
+                 (string->bytes/utf-8 (ws-status-description response-status))
+                 (current-seconds)
+                 TEXT/HTML-MIME-TYPE
+                 '()
+                 (list (string->bytes/utf-8 error-string))))
 
+;; ResponseErrorCode -> String
+;; convert an internal handler error code into an external response
+(define (response-error-code->string error-code)
+  (cond
+    [(= error-code 404) DEFAULT-RESPONSE-404-ROUTE-NOT-FOUND-MESSAGE]
+    [(= error-code 500) RESPONSE-500-INVALID-RESPONSE-MESSAGE]))
+
+;; ResponseErrorCode -> StatusCode
+;; convert an internal handler error code into an external response
+(define (response-error-code->status error-code)
+  (cond
+    [(= error-code 404) 404-NOT-FOUND]
+    [(= error-code 500) 500-INTERNAL-ERROR]))
 
 ;; ResponseType -> Bytes
 (define (ws-response-type->response-type rt)

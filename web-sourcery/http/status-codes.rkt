@@ -17,7 +17,7 @@
 (define 403-FORBIDDEN           (ws-status 403 "TODO"))
 (define 404-NOT-FOUND           (ws-status 404 "TODO"))
 (define 405-METHOD-NOT-ALLOWED  (ws-status 405 "TODO"))
-(define 500-INTERNAL-ERROR      (ws-status 500 "TODO"))
+(define 500-INTERNAL-ERROR      (ws-status 500 "Internal Server Error"))
 (define 501-NOT-IMPLEMENTED     (ws-status 501 "TODO"))
 (define 503-UNAVAILABLE         (ws-status 503 "TODO"))
 

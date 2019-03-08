@@ -11,7 +11,8 @@
          "../utils/basics.rkt")
 
 (require (for-syntax syntax/parse
-                     racket/syntax))
+                     racket/syntax
+                     "../utils/basics.rkt"))
 
 ;; Simulate any request with any given method
 (define-syntax simulate-request
@@ -36,7 +37,5 @@
     [(ws-response? resp)
      (ws-response (serialize-json (ws-response-data resp) serializers) (ws-response-status resp))]
     [(natural? resp)
-     (let [(external-response (response-error-code->response resp))]
-       (ws-response (bytes->string/utf-8 (first (response-output external-response)))
-                    (ws-status (response-code external-response)
-                               (bytes->string/utf-8 (response-message external-response)))))]))
+     (ws-response (response-error-code->string resp)
+                  (response-error-code->status resp))]))
