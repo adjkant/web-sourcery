@@ -4,7 +4,7 @@
 (require sql-sourcery)
 
 ;; Specify a Database
-(sourcery-db "0-0-1-server.db")
+(sourcery-db "test-app.db")
 
 ;; Create Sourcery Structures
 (sourcery-struct session [(path STRING)])
@@ -22,9 +22,9 @@
                    (some      basic-structure-some)
                    (data      basic-structure-data)))
 #;(define data-custom-serializer-2
-  (json-serializer string? #;data?
-                   (field      data-field)
-                   (timestamp  data-timestamp)))
+    (json-serializer string? #;data?
+                     (field      data-field)
+                     (timestamp  data-timestamp)))
 
 #;(define session-serializer (json-serializer-sourcery-struct session))
 
@@ -44,10 +44,10 @@
   (response (json-obj (json-kv 'values (list 1 2 3))) 200-OK))
 
 #;(define-route [app "/accept-json" [GET POST]] -> JSON
-  (response (some-func) 200-OK))
+    (response (some-func) 200-OK))
 
 #;(define-route [app "/return-cookie(and-header)" [GET]] -> TEXT
-  (with-cookies (response "" 200-OK) created-cookies))
+    (with-cookies (response "" 200-OK) created-cookies))
 
 (define-route [app "/json-output-struct" [GET]] -> JSON
   (response (basic-structure 1 2 3) 200-OK))
@@ -116,8 +116,15 @@
 
 ;; ---------------------------------------------------
 
+(module+ test 
+  (with-app-and-serializers app serializers
+    (check-request [GET "/"] -> [TEXT "blank GET" 201-CREATED])
+    (check-request [POST "/"] -> [TEXT "blank POST" 201-CREATED])
+
+    #;(check-request [app serializers GET "/"] -> [JSON basic-structure 201-CREATED])))
+
 ;; Run Application from a custom port
-(run-web-sourcery-app app
-                      #:json-serializers serializers
-                      #:cors? #t
-                      #:port 1000)
+#;(run-web-sourcery-app app
+                        #:json-serializers serializers
+                        #:cors? #t
+                        #:port 1000)

@@ -5,10 +5,14 @@
          run-web-sourcery-app
          GET GET? POST POST? PUT PUT? DELETE DELETE? method->symbol
          (rename-out [user-response response]
-                     [ws-status custom-status])
+                     [ws-status custom-status]
+                     [ws-query-param query-param]
+                     [ws-header header]
+                     [ws-cookie cookie])
          (all-from-out "http/status-codes.rkt")
          json-obj json-kv
-         json-serializer json-serializer-struct)
+         json-serializer json-serializer-struct
+         (all-from-out "request-testing/test-requests.rkt"))
 
 (require web-server/servlet
          web-server/servlet-env
@@ -19,6 +23,7 @@
          "response/response.rkt"
          "json/json.rkt"
          "json/serializers.rkt"
+         "request-testing/test-requests.rkt"
          (for-syntax syntax/parse
                      racket/syntax))
 
@@ -59,7 +64,7 @@
                       (λ (req)
                         (begin
                           #;(displayln (request-post-data/raw req))
-                          (handle-any-request req app-name serializers))))]))
+                          (handle-any-request/external req app-name serializers))))]))
 
 (module+ test
   (check-compile-error (begin

@@ -1,7 +1,8 @@
 #lang racket
 
 (provide define-route
-         handle-any-request)
+         handle-any-request/external
+         handle-any-request/internal)
 
 (require web-server/servlet
          "path-template.rkt"
@@ -11,8 +12,7 @@
          "../data/conversion.rkt"
          "../utils/basics.rkt"
          "../http/methods.rkt"
-         "../response/response.rkt"
-         "../response/preset.rkt")
+         "../response/response.rkt")
 
 (require (for-syntax syntax/parse
                      racket/syntax
@@ -87,19 +87,27 @@
   (check-false (analagous-route? ROUTE-1 ROUTE-4))
   (check-false (analagous-route? ROUTE-2 ROUTE-5))
   (check-false (analagous-route? ROUTE-7 ROUTE-8)))
-  
+
 
 ;; web-server/http/request WSApp [List-of JSONSerializer] -> web-server/http/response
 ;; Handle any request to the server and return an apropriate response
-;; testing here should be done at top level
-(define (handle-any-request req app serializers)
-  (define internal-req (request->ws-request req))
-  (define matching-route (best-matching-route internal-req app))
-  (if matching-route
-      (call-route-with-req matching-route internal-req serializers)
-      DEFAULT-RESPONSE-404-ROUTE-NOT-FOUND))
+(define (handle-any-request/external req app serializers)
+  (define internal-request (request->ws-request req))
+  (define matching-route (best-matching-route internal-request app))
+  (define internal-response (handle-any-request/internal internal-request app serializers))
+  (internal-response->external-response internal-response matching-route serializers))
+  
 
-;; Route Request [List-of JSONSerializer] -> web-server/http/response
+;; Request WSApp [List-of JSONSerializer] -> Response
+;; Handle any request to the server and return an apropriate response
+(define (handle-any-request/internal req app serializers)
+  (define matching-route (best-matching-route req app))
+  (if matching-route
+      (call-route-with-req matching-route req serializers)
+      404))
+        
+
+;; Route Request [List-of JSONSerializer] -> Response
 ;; Call the given route's handler with the given request info and convert the response to an external
 ;; format, producing an error response if the handler does not return a proper value
 (define (call-route-with-req route req serializers)
@@ -112,10 +120,6 @@
   (define handler-inputs (append path-params automatic-handler-inputs))
   (define response (apply (ws-route-handler route) handler-inputs))
   (if (valid-response? response response-type serializers)
-      (ws-response->response response response-type serializers)
-      RESPONSE-500-INVALID-RESPONSE))
+      response
+      500))
 
-
-(module+ test
-  )
-;; TODO testing

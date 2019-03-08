@@ -2,13 +2,15 @@
 
 (provide
  request->ws-request
- ws-response->response
+ internal-response->external-response
+ response-error-code->response
  strings->request-path)
 
 (require web-server/servlet
          json
          "defs.rkt"
          "../response/response.rkt"
+         "../response/preset.rkt"
          "../utils/basics.rkt"
          "../json/json.rkt")
 
@@ -27,9 +29,21 @@
    (request->ws-headers req)
    (request->ws-cookies req)))
 
-;; Response ResponseType [List-of JSONSerializer] -> web-server/http/response
+;; Response [Maybe Route] [List-of JSONSerializer] -> web-server/http/response
 ;; Create an external response for a Response that passes the valid-response? predicate
-(define (ws-response->response r t serializers)
+(define (internal-response->external-response internal-response matching-route serializers)
+  (cond
+    [(ws-response? internal-response)
+     (ws-response->external-response internal-response
+                                     (ws-route-response-type matching-route)
+                                     serializers)]
+    [(natural? internal-response)
+     (response-error-code->response internal-response)]))
+
+;; ValidResponse ResponseType [List-of JSONSerializer] -> web-server/http/response
+;; Create an external response for a ws-response with the given type and serializers
+;; invariant: all response data can be serialized
+(define (ws-response->external-response r t serializers)
   (define response-data-bytes (ws-response-data->bytes (ws-response-data r) serializers))
   (response/full (ws-status-code (ws-response-status r))
                  (string->bytes/utf-8 (ws-status-description (ws-response-status r)))
@@ -37,6 +51,13 @@
                  (ws-response-type->response-type t)
                  ALL-RESPONSE-HEADERS
                  (list response-data-bytes)))
+
+;; ResponseErrorCode -> web-server/http/response
+;; convert an internal handler error code into an external response
+(define (response-error-code->response error-code)
+  (cond
+    [(= error-code 404) DEFAULT-RESPONSE-404-ROUTE-NOT-FOUND]
+    [(= error-code 500) RESPONSE-500-INVALID-RESPONSE]))
 
 
 ;; ResponseType -> Bytes

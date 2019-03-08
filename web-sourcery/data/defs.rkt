@@ -63,7 +63,15 @@
 ;;             [List-of QueryParam] [List-of Header] [List-of Cookie])
 
 (struct ws-response [data status] #:transparent)
-;; A Response is a (ws-response ResponseData StatusCode)
+;; A Response is one of:
+;; - Validresponse
+;; - ResponseErrorCode
+
+;; A ResponseErrorCode is one of:
+;; - 404
+;; - 500
+
+;; A ValidResponse is a (ws-response ResponseData StatusCode)
 
 ;; A ResponseData is one of:
 ;; - String

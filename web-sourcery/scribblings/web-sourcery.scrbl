@@ -137,7 +137,7 @@ In Development
  A shortcut for creating JSON serializable objects with the given list of json-kv's
 }
 
-@defproc[(jsonkv [key string?] [value json-serializable?])
+@defproc[(json-kv [key string?] [value json-serializable?])
          list?]{
  A semantic shortcut for creating JSON serializable pair in a list for a JSON object.
  Equivalent to list.
