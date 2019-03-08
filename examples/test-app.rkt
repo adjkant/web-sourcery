@@ -28,7 +28,7 @@
 
 #;(define session-serializer (json-serializer-sourcery-struct session))
 
-(define serializers (list #;basic-structure-serializer #;session-serializer data-custom-serializer))
+(define serializers (list basic-structure-serializer #;session-serializer data-custom-serializer))
 
 ;; Define an application
 (define-web-sourcery-app app)
@@ -40,23 +40,17 @@
 (define-route [app "" [GET]] -> TEXT
   (response (session-path (session-create "blank GET")) 201-CREATED))
 
+(define-route [app "" [POST]] -> TEXT
+  (response (session-path (session-create "blank POST")) 201-CREATED))
+
 (define-route [app "/json-output-basic" [GET]] -> JSON
   (response (json-obj (json-kv 'values (list 1 2 3))) 200-OK))
-
-#;(define-route [app "/accept-json" [GET POST]] -> JSON
-    (response (some-func) 200-OK))
-
-#;(define-route [app "/return-cookie(and-header)" [GET]] -> TEXT
-    (with-cookies (response "" 200-OK) created-cookies))
 
 (define-route [app "/json-output-struct" [GET]] -> JSON
   (response (basic-structure 1 2 3) 200-OK))
 
 (define-route [app "/json-output-invalid-type-match" [GET]] -> TEXT
   (response (list 1 2 3) 200-OK))
-
-(define-route [app "" [POST]] -> TEXT
-  (response (session-path (session-create "blank POST")) 201-CREATED))
 
 (define-route [app "/all-methods" [GET POST PUT DELETE]] -> TEXT
   (response (session-path
@@ -67,10 +61,11 @@
                 [(PUT? method) "all methods PUT"]
                 [(DELETE? method) "all methods DELETE"]
                 [else "no matching method"])))
-            200-OK))
+            201-CREATED))
 
 (define-route [app "/example" [GET]] -> TEXT
   (response (session-path (session-create "example")) 201-CREATED))
+
 
 (define-route [app "/data" [GET]] -> TEXT
   (begin
@@ -79,6 +74,12 @@
      (for/fold ((cur "")) ((s (sourcery-load session)))
        (string-append (session-path s) "<br>" cur))
      201-CREATED)))
+
+#;(define-route [app "/accept-json" [GET POST]] -> JSON
+    (response (some-func) 200-OK))
+
+#;(define-route [app "/return-cookie(and-header)" [GET]] -> TEXT
+    (with-cookies (response "" 200-OK) created-cookies))
 
 (define-route [app "/<int:param-num>" [GET]] -> TEXT
   (response (session-path (session-create (string-append "Matched an int: "
@@ -90,7 +91,7 @@
             201-CREATED))
 
 (define-route [app "/query-param-value-x" [GET]] -> TEXT
-  (response (session-path (session-create (format "query param x value: ~s" (query-params "x"))))
+  (response (session-path (session-create (format "query param x value: ~a" (query-params "x"))))
             201-CREATED))
 
 (define-route [app "/header/<string:header-field>" [GET]] -> TEXT
@@ -116,12 +117,46 @@
 
 ;; ---------------------------------------------------
 
-(module+ test 
-  (with-app-and-serializers app serializers
+(module+ test
+  (with-app-and-serializers app (list (json-serializer-struct basic-structure))
     (check-request [GET "/"] -> [TEXT "blank GET" 201-CREATED])
     (check-request [POST "/"] -> [TEXT "blank POST" 201-CREATED])
+    (check-request [GET "/json-output-struct"] -> [JSON (basic-structure 1 2 3) 200-OK])
+    (check-request [GET "/json-output-invalid-type-match"] ->
+                   [TEXT "Internal WebSoucery Error: route handler did not return a valid response"
+                         500-INTERNAL-ERROR])
+    (check-request [GET "/all-methods"] -> [TEXT "all methods GET" 201-CREATED])
+    (check-request [POST "/all-methods"] -> [TEXT "all methods POST" 201-CREATED])
+    (check-request [PUT "/all-methods"] -> [TEXT "all methods PUT" 201-CREATED])
+    (check-request [DELETE "/all-methods"] -> [TEXT "all methods DELETE" 201-CREATED])
+    (check-request [GET "/example"] -> [TEXT "example" 201-CREATED])
+    (check-request [GET "/foo"] -> [TEXT "Matched a string: foo" 201-CREATED])
+    (check-request [GET "/bar"] -> [TEXT "Matched a string: bar" 201-CREATED])
+    (check-request [GET "/1"] ->
+                   [TEXT "Matched an int: 1" 201-CREATED])
+    (check-request [GET "/-5000"] -> [TEXT "Matched an int: -5000" 201-CREATED])
+    (check-request [GET "/query-param-value-x" #:query-params (list (query-param "x" "1"))] ->
+                   [TEXT "query param x value: 1" 201-CREATED])
+    (check-request [GET "/foo/bar"] ->
+                   [TEXT "WebSoucery: No Matching Route - 404 TODO" 404-NOT-FOUND])
+    (check-request [GET "/cookie/a"
+                        #:cookies (list (cookie "a" "b"))] ->
+                   [TEXT "b" 200-OK])
+    (check-request [GET "/cookie/c"
+                        #:cookies (list (cookie "a" "b"))] ->
+                   [TEXT "No Matching Cookie" 200-OK])
+    (check-request [GET "/header/a"
+                        #:headers (list (header "a" "b"))] ->
+                   [TEXT "b" 200-OK])
+    (check-request [GET "/header/c"
+                        #:headers (list (header "a" "b"))] ->
+                   [TEXT "No Matching Header" 200-OK])
+    (check-request [GET "/custom-response-code"] ->
+                   [TEXT "I'm a little lambda short and sweet" (custom-status 250 "Little Lambda")])
 
-    #;(check-request [app serializers GET "/"] -> [JSON basic-structure 201-CREATED])))
+    #;(check-request [] -> [])
+
+    #;(check-request [GET "/"] -> [JSON basic-structure 201-CREATED])))
 
 ;; Run Application from a custom port
 #;(run-web-sourcery-app app
