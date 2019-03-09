@@ -23,10 +23,26 @@
     [(_ exn-expr failure-message:string) #'(check-exn exn:fail? (λ () exn-expr) failure-message)]
     [(_ exn-expr) #'(check-exn exn:fail? (λ () exn-expr))]))
 
+(define-syntax check-not-error
+  (syntax-parser
+    [(_ expr failure-message:string) #'(check-not-exn (λ () expr) failure-message)]
+    [(_ expr) #'(check-not-exn (λ () expr))]))
+
+(define-syntax check-compile
+  (syntax-parser
+    [(_ cmp-exn-expr ... failure-message:string)
+     #`(check-not-error (eval-syntax #`(begin (require "main.rkt") #,#'cmp-exn-expr ...))
+                        failure-message)]
+    [(_ cmp-exn-expr ...)
+     #`(check-not-error (eval-syntax #`(begin (require "main.rkt") #,#'cmp-exn-expr ...)))]))
+
 (define-syntax check-compile-error
   (syntax-parser
-    [(_ cmp-exn-expr failure-message:string) #`(check-error (compile #'cmp-exn-expr) failure-message)]
-    [(_ cmp-exn-expr) #`(check-error (compile #'cmp-exn-expr))]))
+    [(_ cmp-exn-expr ... failure-message:string)
+     #`(check-error (eval-syntax #`(begin (require "main.rkt") #,#'cmp-exn-expr ...))
+                    failure-message)]
+    [(_ cmp-exn-expr ...)
+     #`(check-error (eval-syntax #`(begin (require "main.rkt") #,#'cmp-exn-expr ...)))]))
 
 (define REQ-PART-1 (ws-req-path-part "hello" '(string)))
 (define REQ-PART-2 (ws-req-path-part "world" '(string)))

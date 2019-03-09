@@ -40,6 +40,7 @@
     [(_ app-name:id) #'(define app-name '())]))
 
 (module+ test
+  (check-compile       (define-web-sourcery-app x))
   (check-compile-error (define-web-sourcery-app x y))
   (check-compile-error (define-web-sourcery-app))
   (check-compile-error (define-web-sourcery-app "string"))
@@ -67,13 +68,93 @@
                           (handle-any-request/external req app-name serializers))))]))
 
 (module+ test
-  (check-compile-error (begin
-                         (define-web-sourcery-app app)
-                         (run-web-sourcery-app app 2)))
-  (check-compile-error (begin
-                         (define-web-sourcery-app app)
-                         (run-web-sourcery-app app #:portt 1)))
+  (check-compile-error (define-web-sourcery-app app)
+                       (run-web-sourcery-app app 2))
   
-  (check-compile-error (begin
-                         (define-web-sourcery-app app)
-                         (run-web-sourcery-app app #:port "a"))))
+  (check-compile-error (define-web-sourcery-app app)
+                       (run-web-sourcery-app app #:portt 1))
+  
+  (check-compile-error (define-web-sourcery-app app)
+                       (run-web-sourcery-app app #:port "a")))
+
+;; Testing Route Syntax
+
+(module+ test
+  (check-compile
+   (define-web-sourcery-app app)
+   (define-route [app "/" [GET]] -> TEXT
+     (response "Yay" 200-OK))
+   "define-route failed")
+
+  (check-compile
+   (define-web-sourcery-app app)
+   (define-route [app "/" [GET]] -> TEXT
+     "anything can go in the body at compile time")
+   "define-route failed")
+
+  (check-compile
+   (define-web-sourcery-app app)
+   (define-route [app "/" [GET]] -> JSON
+     "the type doesn't have to match either")
+   "define-route failed")
+
+  (check-compile-error
+   (define-web-sourcery-app app)
+   (define-route [app "/" [GET]] -> TEXTY
+     "nonexistant types should fail")
+   "bad define-route succeeded")
+
+  (check-compile-error
+   (define-web-sourcery-app app)
+   (define-route [app "/" []] -> TEXT
+     "you need at least one method")
+   "bad define-route succeeded")
+
+  (check-compile-error
+   (define-web-sourcery-app app)
+   (define-route [app "/" [GETTY]] -> TEXT
+     "no made up methods")
+   "bad define-route succeeded")
+
+  (check-compile-error
+   (define-web-sourcery-app app)
+   (define-route [badapp "/" [GET]] -> TEXT
+     "the app name must be defined")
+   "bad define-route succeeded")
+
+  (check-compile-error
+   (define-web-sourcery-app app)
+   (define-route [app "/" [GET]] --> TEXT
+     "the arrow must be exact")
+   "bad define-route succeeded")
+
+  (check-compile-error
+   (define-web-sourcery-app app)
+   (define-route [app "/<int:x>" [GET]] -> TEXT
+     "two routes cannot be analagous")
+   (define-route [app "/<int:y>" [GET]] -> TEXT
+     "two routes cannot be analagous")
+   "bad define-route succeeded")
+
+  (check-compile
+   (define-web-sourcery-app app)
+   (define-route [app "/<int:x>" [GET]] -> TEXT
+     "two routes cannot be analagous")
+   (define-route [app "/<int:y>" [POST]] -> TEXT
+     "but they can be for different HTTP verbs")
+   "define-route failed")
+
+  (check-compile-error
+   (define-web-sourcery-app app)
+   (define-route [app "/<int:x>/<strng:x>" [GET]] -> TEXT
+     "duplicate route params cannot exists")
+   "bad define-route succeeded")
+
+  ;; route testing template
+  #;(check-compile-error
+     (define-web-sourcery-app app)
+     (define-route [app "/" [GET]] -> TEXT
+       "")
+     "bad define-route succeeded")
+
+  )

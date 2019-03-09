@@ -106,9 +106,6 @@
                 "No Matching Cookie")
             200-OK))
 
-#;(define-route [app "/<int:param-num-dupe>" [GET POST]] -> TEXT
-    "should never compile because of overlap with another route")
-
 (define-route [app "/error-bad-return-type" [GET]] -> TEXT
   (response #false 200-OK))
 
@@ -155,7 +152,6 @@
                    [TEXT "I'm a little lambda short and sweet" (custom-status 250 "Little Lambda")])
 
     #;(check-request [] -> [])
-
     #;(check-request [GET "/"] -> [JSON basic-structure 201-CREATED])))
 
 ;; Run Application from a custom port

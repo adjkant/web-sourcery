@@ -58,7 +58,8 @@
   (check-equal? (string->path-template "/<string:matched-string>") PATH-TEMP-3)
   (check-equal? (string->path-template "/<int:matched-int>") PATH-TEMP-4)
   (check-equal? (string->path-template "/<int:i1>/<int:i2>/<int:i3>") PATH-TEMP-6)
-  (check-false (string->path-template "/<s:matched-string>")))
+  (check-false (string->path-template "/<s:matched-string>"))
+  (check-false (string->path-template "/<int:x>/<strng:x>")))
 
 ;; String -> Boolean
 ;; determine if the string is a valid PathPart

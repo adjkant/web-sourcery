@@ -26,8 +26,17 @@
 ;; TODO contacts on methods
 (define-syntax define-route
   (syntax-parser
-    [(_ [app-name:id path:string [method ...]] (~literal ->) response-type-syntax:id route-body)
+    [(_ [app-name:id path:string [one-method method ...]]
+        (~literal ->)
+        response-type-syntax:id route-body)
+     
      (define path-template (string->path-template (syntax->datum #'path)))
+
+     (unless path-template
+       (raise-syntax-error
+        'define-route
+        (format "invalid path template syntax in \"~s\"" (syntax->datum #'path))))
+     
      (define param-names (get-param-names path-template))
      (define param-ids (map (λ (n) (format-id #'path "~a" n)) param-names))
      (define trailing-ids (list (format-id #'path "~a" "method")
@@ -36,11 +45,6 @@
                                 (format-id #'path "~a" "cookies")))
      (define handler-inputs (append param-ids trailing-ids))
      (define response-type (syntax->datum #'response-type-syntax))
-     
-     (unless path-template
-       (raise-syntax-error
-        'define-route
-        (format "invalid path template syntax in \"~s\"" (syntax->datum #'path))))
 
      (when (duplicates? param-names)
        (raise-syntax-error
@@ -56,7 +60,7 @@
      #`(set! app-name
              (add-route path
                         (ws-route (string->path-template path)
-                                  (list method ...)
+                                  (list one-method method ...)
                                   (string->symbol #,(symbol->string response-type))
                                   (lambda #,handler-inputs route-body))
                         app-name))]))
