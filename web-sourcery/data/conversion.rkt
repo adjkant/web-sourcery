@@ -10,12 +10,12 @@
 
 (require web-server/servlet
          json
+         json-sourcery
          "defs.rkt"
          "../response/response.rkt"
          "../response/preset.rkt"
          "../http/status-codes.rkt"
-         "../utils/basics.rkt"
-         "../json/json.rkt")
+         "../utils/basics.rkt")
 
 (module+ test (require "../utils/testing.rkt"))
 
@@ -86,7 +86,7 @@
   (cond [(symbol=? rt 'TEXT) TEXT/HTML-MIME-TYPE]
         [(symbol=? rt 'JSON) JSON-MIME-TYPE]))
 
-;; ResponseData -> Bytes
+;; Any -> Bytes
 (define (ws-response-data->bytes rd serializers)
   (cond [(string? rd) (string->bytes/utf-8 rd)]
         [else (jsexpr->bytes (serialize-json rd serializers))]))

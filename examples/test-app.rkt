@@ -11,6 +11,7 @@
 (sourcery-struct data [(field STRING) (timestamp INTEGER)])
 
 (struct basic-structure [here some data] #:transparent)
+(struct unserializable [struct] #:transparent)
 #;(struct sub basic-structure [])
 
 #;(json-serializer-struct sub)
@@ -18,13 +19,13 @@
 (define basic-structure-serializer (json-serializer-struct basic-structure))
 
 (define data-custom-serializer
-  (json-serializer basic-structure?
-                   (some      basic-structure-some)
-                   (data      basic-structure-data)))
+  (json-serializer-obj basic-structure?
+                       (some      basic-structure-some)
+                       (data      basic-structure-data)))
 #;(define data-custom-serializer-2
-    (json-serializer string? #;data?
-                     (field      data-field)
-                     (timestamp  data-timestamp)))
+    (json-serializer-obj string? #;data?
+                         (field      data-field)
+                         (timestamp  data-timestamp)))
 
 #;(define session-serializer (json-serializer-sourcery-struct session))
 
@@ -48,6 +49,9 @@
 
 (define-route [app "/json-output-struct" [GET]] -> JSON
   (response (basic-structure 1 2 3) 200-OK))
+
+(define-route [app "/json-output-unserializable" [GET]] -> JSON
+  (response (unserializable 1) 200-OK))
 
 (define-route [app "/json-output-invalid-type-match" [GET]] -> TEXT
   (response (list 1 2 3) 200-OK))
@@ -122,6 +126,9 @@
     (check-request [GET "/json-output-invalid-type-match"] ->
                    [TEXT "Internal WebSoucery Error: route handler did not return a valid response"
                          500-INTERNAL-ERROR])
+    (check-request [GET "/json-output-unserializable"] ->
+                   [TEXT "Internal WebSoucery Error: route handler did not return a valid response"
+                         500-INTERNAL-ERROR]) ;; TODO better error message
     (check-request [GET "/all-methods"] -> [TEXT "all methods GET" 201-CREATED])
     (check-request [POST "/all-methods"] -> [TEXT "all methods POST" 201-CREATED])
     (check-request [PUT "/all-methods"] -> [TEXT "all methods PUT" 201-CREATED])
@@ -137,16 +144,20 @@
     (check-request [GET "/foo/bar"] ->
                    [TEXT "WebSoucery: No Matching Route - 404 TODO" 404-NOT-FOUND])
     (check-request [GET "/cookie/a"
-                        #:cookies (list (cookie "a" "b"))] ->
+                        #:cookies (list (cookie "a" "b"))]
+                   ->
                    [TEXT "b" 200-OK])
     (check-request [GET "/cookie/c"
-                        #:cookies (list (cookie "a" "b"))] ->
+                        #:cookies (list (cookie "a" "b"))]
+                   ->
                    [TEXT "No Matching Cookie" 200-OK])
     (check-request [GET "/header/a"
-                        #:headers (list (header "a" "b"))] ->
+                        #:headers (list (header "a" "b"))]
+                   ->
                    [TEXT "b" 200-OK])
     (check-request [GET "/header/c"
-                        #:headers (list (header "a" "b"))] ->
+                        #:headers (list (header "a" "b"))]
+                   ->
                    [TEXT "No Matching Header" 200-OK])
     (check-request [GET "/custom-response-code"] ->
                    [TEXT "I'm a little lambda short and sweet" (custom-status 250 "Little Lambda")])

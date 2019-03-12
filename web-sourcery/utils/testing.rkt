@@ -1,21 +1,14 @@
 #lang racket
 
-(provide
-
- ;; Basic Testing via Racket
- (all-from-out rackunit)
-
- syntax
-
- ;; All In File
- (all-defined-out)
- )
+(provide (all-from-out rackunit)
+         (all-defined-out))
 
 (require rackunit
          "../http/status-codes.rkt"
          "../data/defs.rkt"
-         "../http/methods.rkt"
-         (for-syntax syntax/parse
+         "../http/methods.rkt")
+
+(require (for-syntax syntax/parse
                      rackunit))
 
 (define-syntax check-error

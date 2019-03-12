@@ -7,9 +7,9 @@
 
 (require web-server/servlet
          json
+         json-sourcery
          "../data/defs.rkt"
-         "../http/status-codes.rkt"
-         "../json/json.rkt")
+         "../http/status-codes.rkt")
 
 (define (user-response data status)
   (ws-response data status))

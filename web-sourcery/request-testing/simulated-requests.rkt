@@ -3,11 +3,11 @@
 (provide simulate-request)
 
 (require web-server/http
+         json-sourcery
          "../routing/routing.rkt"
          "../http/methods.rkt"
          "../data/defs.rkt"
          "../data/conversion.rkt"
-         "../json/json.rkt"
          "../utils/basics.rkt")
 
 (require (for-syntax syntax/parse
@@ -26,13 +26,13 @@
                (strings->request-path (trim-trailing-empty-string (string-split path "/"))))
               (internal-req
                (ws-request method request-path query-params headers cookies))]
-         (stringify-response-data-and-errors
+         (convert-response-data-and-errors
           (handle-any-request/internal internal-req app serializers)
           serializers))]))
 
 ;; Response [List-of JSONSerializer] -> (ws-response String StatusCode)
 ;; stringify the given responses data only
-(define (stringify-response-data-and-errors resp serializers)
+(define (convert-response-data-and-errors resp serializers)
   (cond
     [(ws-response? resp)
      (ws-response (serialize-json (ws-response-data resp) serializers) (ws-response-status resp))]

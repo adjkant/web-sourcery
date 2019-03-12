@@ -3,10 +3,10 @@
 (provide check-request
          with-app-and-serializers)
 
-(require "simulated-requests.rkt"
+(require json-sourcery
+         "simulated-requests.rkt"
          "../http/methods.rkt"
          "../data/defs.rkt"
-         "../json/json.rkt"
          "../utils/basics.rkt"
          rackunit)
 

@@ -4,25 +4,23 @@
          define-route
          run-web-sourcery-app
          GET GET? POST POST? PUT PUT? DELETE DELETE? method->symbol
+         (all-from-out json-sourcery)
          (rename-out [user-response response]
                      [ws-status custom-status]
                      [ws-query-param query-param]
                      [ws-header header]
                      [ws-cookie cookie])
          (all-from-out "http/status-codes.rkt")
-         json-obj json-kv
-         json-serializer json-serializer-struct
          (all-from-out "request-testing/test-requests.rkt"))
 
 (require web-server/servlet
          web-server/servlet-env
+         json-sourcery
          "routing/routing.rkt"
          "http/methods.rkt"
          "http/status-codes.rkt"
          "data/defs.rkt"
          "response/response.rkt"
-         "json/json.rkt"
-         "json/serializers.rkt"
          "request-testing/test-requests.rkt"
          (for-syntax syntax/parse
                      racket/syntax))

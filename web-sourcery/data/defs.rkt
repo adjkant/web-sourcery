@@ -13,8 +13,7 @@
          (struct-out ws-status)
          (struct-out ws-query-param)
          (struct-out ws-header)
-         (struct-out ws-cookie)
-         (struct-out ws-json-serializer))
+         (struct-out ws-cookie))
 
 
 ;; A WSApp is a [List-of Route]
@@ -64,22 +63,14 @@
 
 (struct ws-response [data status] #:transparent)
 ;; A Response is one of:
-;; - Validresponse
+;; - ValidResponse
 ;; - ResponseErrorCode
 
 ;; A ResponseErrorCode is one of:
 ;; - 404
 ;; - 500
 
-;; A ValidResponse is a (ws-response ResponseData StatusCode)
-
-;; A ResponseData is one of:
-;; - String
-;; - WSJSONExpr
-
-;; A WSJSONExpr is an expression that either:
-;; - passes jsexpr?
-;; - passes a predicate for a given serializer and all parts recursivly are WSJSONExpr
+;; A ValidResponse is a (ws-response Any StatusCode)
 
 ;; A ResponseType is one of:
 ;; - 'TEXT
@@ -107,6 +98,3 @@
 
 (struct ws-cookie [name value] #:transparent)
 ;; A Cookie is a (ws-header String String)
-
-(struct ws-json-serializer [predicate fields] #:transparent)
-;; A JSONSerializer is a (ws-json-serializer [X -> Boolean] (list String [Y -> WSJSONExpr])

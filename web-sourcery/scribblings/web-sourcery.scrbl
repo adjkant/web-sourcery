@@ -6,7 +6,8 @@
 @(require scribble/example
           racket/sandbox
           sql-sourcery
-          (for-label "../main.rkt"))
+          (for-label "../main.rkt"
+                     racket))
 
 @(define sourcery-eval
    (parameterize ([sandbox-output 'string]
@@ -132,7 +133,7 @@ In Development
 
 @subsection{JSON Object Shortcuts}
 
-@defproc[(json-obj [kv-pairs list?])
+@defproc[(json-obj [kv-pairs (listof json-kv)])
          hash?]{
  A shortcut for creating JSON serializable objects with the given list of json-kv's
 }
