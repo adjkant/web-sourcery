@@ -75,10 +75,10 @@
 
 (define HEADERS-1 (list HEADER-1 HEADER-2 HEADER-3))
 
-(define REQ-1 (ws-request GET REQ-PATH-1 #f '() '()))
-(define REQ-2 (ws-request GET REQ-PATH-2 #f HEADERS-1 COOKIES-1))
-(define REQ-3 (ws-request GET REQ-PATH-3 #f HEADERS-1 COOKIES-1))
-(define REQ-4 (ws-request GET REQ-PATH-4 #f HEADERS-1 COOKIES-1))
+(define REQ-1 (ws-request GET REQ-PATH-1 #f '() '() #f 'none '()))
+(define REQ-2 (ws-request GET REQ-PATH-2 #f HEADERS-1 COOKIES-1 #f 'none '()))
+(define REQ-3 (ws-request GET REQ-PATH-3 #f HEADERS-1 COOKIES-1 #f 'none '()))
+(define REQ-4 (ws-request GET REQ-PATH-4 #f HEADERS-1 COOKIES-1 #f 'none '()))
 
 (define ROUTE-PARAM-STR (ws-route-param "matched-string" 'string))
 (define ROUTE-PARAM-INT (ws-route-param "matched-int" 'int))

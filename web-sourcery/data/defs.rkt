@@ -13,7 +13,8 @@
          (struct-out ws-status)
          (struct-out ws-query-param)
          (struct-out ws-header)
-         (struct-out ws-cookie))
+         (struct-out ws-cookie)
+         (struct-out ws-file))
 
 
 ;; A WSApp is a [List-of Route]
@@ -56,10 +57,22 @@
 ;; - 'param
 ;; - #false
 
-(struct ws-request [method path query-params headers cookies] #:transparent)
+;; A JSONSource is one of:
+;; - 'json
+;; - 'form
+;; - 'url
+;; - 'none
+
+(struct ws-file [field filename content-type contents] #:transparent)
+;; A File is a (ws-file String String String Bytes)
+
+(struct ws-request [method path query-params headers cookies json json-source files]
+  #:transparent)
+
 ;; A Request is a
 ;; (ws-request Method [List-of RequestPathPart]
-;;             [List-of QueryParam] [List-of Header] [List-of Cookie])
+;;             [List-of QueryParam] [List-of Header] [List-of Cookie]
+;;             [Maybe jsexpr] JSONSource [List-of File])
 
 (struct ws-response [data status] #:transparent)
 ;; A Response is one of:

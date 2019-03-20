@@ -11,7 +11,8 @@
                      [ws-header header]
                      [ws-cookie cookie])
          (all-from-out "http/status-codes.rkt")
-         (all-from-out "request-testing/test-requests.rkt"))
+         (all-from-out "request-testing/test-requests.rkt")
+         (struct-out ws-file))
 
 (require web-server/servlet
          web-server/servlet-env
@@ -62,7 +63,6 @@
                       #:stateless? #t
                       (λ (req)
                         (begin
-                          #;(displayln (request-post-data/raw req))
                           (handle-any-request/external req app-name serializers))))]))
 
 (module+ test

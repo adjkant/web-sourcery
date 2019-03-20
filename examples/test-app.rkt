@@ -79,11 +79,21 @@
        (string-append (session-path s) "<br>" cur))
      201-CREATED)))
 
-#;(define-route [app "/accept-json" [GET POST]] -> JSON
-    (response (some-func) 200-OK))
+(define-route [app "/accept-json-from-anywhere" [GET POST]] -> JSON
+  (response (json-obj (json-kv 'value req-json)
+                      (json-kv 'source (symbol->string json-source))
+                      (json-kv 'num-files (length files)))
+            200-OK))
 
 #;(define-route [app "/return-cookie(and-header)" [GET]] -> TEXT
-    (with-cookies (response "" 200-OK) created-cookies))
+    (with-headers (with-cookies (response "" 200-OK) (cookie "c" "d")) (header "a" "b")))
+
+#;(define-route [app "/return-cookie(and-header)-alt" [GET]] -> TEXT
+    (with-headers
+        (with-cookies
+            (response "" 200-OK)
+          (list (cookie "c" "d")))
+      (list (header "a" "b"))))
 
 (define-route [app "/<int:param-num>" [GET]] -> TEXT
   (response (session-path (session-create (string-append "Matched an int: "

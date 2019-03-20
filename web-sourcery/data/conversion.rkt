@@ -24,13 +24,17 @@
 ;; web-server/http/request -> Request
 ;; Convert to an internal request representation
 (define (request->ws-request req)
+  (define ws-headers (request->ws-headers req))
   (ws-request
    (request->ws-method req)
    (strings->request-path (trim-trailing-empty-string (map path/param-path
                                                            (url-path (request-uri req)))))
    (request->ws-query-params req)
-   (request->ws-headers req)
-   (request->ws-cookies req)))
+   ws-headers
+   (request->ws-cookies req)
+   (request->json req ws-headers)
+   (request->data-source req ws-headers)
+   (request->files req)))
 
 ;; Response [Maybe Route] [List-of JSONSerializer] -> web-server/http/response
 ;; Create an external response for a Response that passes the valid-response? predicate
@@ -160,3 +164,71 @@
 (define (header->ws-header h)
   (ws-header (bytes->string/utf-8 (header-field h))
              (bytes->string/utf-8 (header-value h))))
+
+;; web-server/http/request [List-of Header] -> [Maybe jsexpr]
+;; get JSON from a requests's post data, url enconced variables, or form data
+(define (request->json req headers)
+  (define req-bindings (filter binding:form? (force (request-bindings/raw-promise req))))
+  (define req-post-data (request-post-data/raw req))
+  (define req-post-string (if req-post-data (bytes->string/utf-8 req-post-data) ""))
+  (define has-json-header
+    (not (empty? (filter (λ (h)
+                           (and (string=? (ws-header-field h) "Content-Type")
+                                (string=? (ws-header-value h) "application/json")))
+                         headers))))
+  (cond [(empty? req-bindings)
+         (when/f (and (jsexpr? req-post-string) has-json-header)
+                 (string->jsexpr req-post-string))]
+        [else (request-bindings->json/f req-bindings)]))
+
+;; [List-of web-server/http/request-structs/binding] -> [Maybe jsexpr]
+;; turn a list of bindings into JSON or #f if no bindings exist
+(define (request-bindings->json/f bindings)
+  (when/f (cons? bindings)
+          (json-obj (map (λ (b) (json-kv (string->symbol (bytes->string/utf-8 (binding-id b)))
+                                         (bytes->string/utf-8 (binding:form-value b))))
+                         bindings))))
+        
+;; web-server/http/request [List-of Header] -> JSONSource
+;; find the source of the converted JSON for a given request
+(define (request->data-source req headers)
+  (define req-bindings (filter binding:form? (force (request-bindings/raw-promise req))))
+  (define req-post-data (request-post-data/raw req))
+  (define req-post-string (if req-post-data (bytes->string/utf-8 req-post-data) ""))
+  (define has-json-header
+    (not (empty? (filter (λ (h)
+                           (and (string=? (ws-header-field h) "Content-Type")
+                                (string=? (ws-header-value h) "application/json")))
+                         headers))))
+  (cond [(empty? req-bindings)
+         (if (and (jsexpr? req-post-string) has-json-header)
+             'json
+             'none)]
+        [(> (string-length req-post-string) 0) 'url]
+        [else 'form]))
+
+
+;; web-server/http/request -> [List-of File]
+;; get the files out of a request and convert them to ws-files
+(define (request->files req)
+  (map file->ws-file (filter binding:file? (force (request-bindings/raw-promise req)))))
+
+;; web-server/http/request-structs/binding:file -> File
+;; convert a single file to a ws-file
+(define (file->ws-file f)
+  (define file-content-type
+    (foldr (λ (h v)
+             (if (string=? "Content-Type" (ws-header-field h))
+                 (ws-header-value h)
+                 ""))
+           ""
+           (map header->ws-header (binding:file-headers f))))
+  (ws-file (bytes->string/utf-8 (binding-id f))
+           (bytes->string/utf-8 (binding:file-filename f))
+           file-content-type
+           (bytes->string/utf-8 (binding:file-content f))))
+
+
+
+
+
