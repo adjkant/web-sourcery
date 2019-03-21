@@ -174,6 +174,11 @@
                         #:headers (list (header "a" "b"))]
                    ->
                    [TEXT "No Matching Header" 200-OK])
+    (check-request [GET "/return-cookie-and-header"]
+                   ->
+                   [TEXT "" 200-OK
+                         #:with-headers (list (header "a" "b"))
+                         #:with-cookies (list (cookie "c" "d"))])
     (check-request [GET "/custom-response-code"] ->
                    [TEXT "I'm a little lambda short and sweet" (custom-status 250 "Little Lambda")])
 
