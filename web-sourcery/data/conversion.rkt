@@ -226,7 +226,7 @@
   (ws-file (bytes->string/utf-8 (binding-id f))
            (bytes->string/utf-8 (binding:file-filename f))
            file-content-type
-           (bytes->string/utf-8 (binding:file-content f))))
+           (binding:file-content f)))
 
 
 

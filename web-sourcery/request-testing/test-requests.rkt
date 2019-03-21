@@ -20,7 +20,8 @@
     [(_ [app serializers method path
              (~alt (~optional (~seq #:query-params query-params)    #:defaults ([query-params #''()]))
                    (~optional (~seq #:headers headers)              #:defaults ([headers #''()]))
-                   (~optional (~seq #:cookies cookies)              #:defaults ([cookies #''()])))
+                   (~optional (~seq #:cookies cookies)              #:defaults ([cookies #''()]))
+                   (~optional (~seq #:json json)                    #:defaults ([json #''none])))
              ...]
         (~literal ->)
         [type data status])
@@ -29,7 +30,8 @@
          (define request-response (simulate-request app serializers method path
                                                     #:query-params query-params
                                                     #:headers headers
-                                                    #:cookies cookies))
+                                                    #:cookies cookies
+                                                    #:json json))
          (define check-data-string (if (and #,is-json-check?
                                             (json-serializable? data serializers))
                                        (serialize-json data serializers)

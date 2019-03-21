@@ -133,6 +133,12 @@
     (check-request [GET "/"] -> [TEXT "blank GET" 201-CREATED])
     (check-request [POST "/"] -> [TEXT "blank POST" 201-CREATED])
     (check-request [GET "/json-output-struct"] -> [JSON (basic-structure 1 2 3) 200-OK])
+    (check-request [POST "/accept-json-from-anywhere" #:json 1]
+                   ->
+                   [JSON (json-obj (json-kv 'value 1)
+                                   (json-kv 'source "json")
+                                   (json-kv 'num-files 0))
+                         200-OK])
     (check-request [GET "/json-output-invalid-type-match"] ->
                    [TEXT "Internal WebSoucery Error: route handler did not return a valid response"
                          500-INTERNAL-ERROR])

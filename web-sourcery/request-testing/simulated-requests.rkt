@@ -20,12 +20,15 @@
     [(_ app serializers method path
         (~alt (~optional (~seq #:query-params query-params)       #:defaults ([query-params #''()]))
               (~optional (~seq #:headers headers)                 #:defaults ([headers #''()]))
-              (~optional (~seq #:cookies cookies)                 #:defaults ([cookies #''()])))
+              (~optional (~seq #:cookies cookies)                 #:defaults ([cookies #''()]))
+              (~optional (~seq #:json json)                       #:defaults ([json #''none])))
         ...)
      #'(let* [(request-path
                (strings->request-path (trim-trailing-empty-string (string-split path "/"))))
+              (req-json (if (equal? json 'none) #f json))
+              (json-src (if (equal? json 'none) (string->symbol "none") (string->symbol "json")))
               (internal-req
-               (ws-request method request-path query-params headers cookies))]
+               (ws-request method request-path query-params headers cookies req-json json-src '()))]
          (convert-response-data-and-errors
           (handle-any-request/internal internal-req app serializers)
           serializers))]))
