@@ -74,7 +74,7 @@
 ;;             [List-of QueryParam] [List-of Header] [List-of Cookie]
 ;;             [Maybe jsexpr] JSONSource [List-of File])
 
-(struct ws-response [data status] #:transparent)
+(struct ws-response [data status headers cookies] #:transparent)
 ;; A Response is one of:
 ;; - ValidResponse
 ;; - ResponseErrorCode
@@ -83,7 +83,7 @@
 ;; - 404
 ;; - 500
 
-;; A ValidResponse is a (ws-response Any StatusCode)
+;; A ValidResponse is a (ws-response Any StatusCode [List-of Header] [List-of Cookie])
 
 ;; A ResponseType is one of:
 ;; - 'TEXT

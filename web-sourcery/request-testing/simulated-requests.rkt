@@ -38,7 +38,11 @@
 (define (convert-response-data-and-errors resp serializers)
   (cond
     [(ws-response? resp)
-     (ws-response (serialize-json (ws-response-data resp) serializers) (ws-response-status resp))]
+     (ws-response (serialize-json (ws-response-data resp) serializers)
+                  (ws-response-status resp)
+                  (ws-response-headers resp)
+                  (ws-response-cookies resp))]
     [(natural? resp)
      (ws-response (response-error-code->string resp)
-                  (response-error-code->status resp))]))
+                  (response-error-code->status resp)
+                  '() '())]))

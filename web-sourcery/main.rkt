@@ -10,6 +10,7 @@
                      [ws-query-param query-param]
                      [ws-header header]
                      [ws-cookie cookie])
+         with-headers with-cookies
          (all-from-out "http/status-codes.rkt")
          (all-from-out "request-testing/test-requests.rkt")
          (struct-out ws-file))

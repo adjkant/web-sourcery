@@ -152,11 +152,11 @@
 
 (define MATCHED-ROUTES-1 (list MATCHED-ROUTE-1 MATCHED-ROUTE-6))
 
-(define RESPONSE-1 (ws-response "Hello World" 200-OK))
-(define RESPONSE-2 (ws-response 1 200-OK))
-(define RESPONSE-3 (ws-response (list 1 2 3) 200-OK))
+(define RESPONSE-1 (ws-response "Hello World" 200-OK '() '()))
+(define RESPONSE-2 (ws-response 1 200-OK '() '()))
+(define RESPONSE-3 (ws-response (list 1 2 3) 200-OK '() '()))
 
-(define BAD-RESPONSE-1 (ws-response "Hello World" 1))
+(define BAD-RESPONSE-1 (ws-response "Hello World" 1 '() '()))
 
 
 

@@ -56,7 +56,9 @@
                  (string->bytes/utf-8 (ws-status-description (ws-response-status r)))
                  (current-seconds)
                  (ws-response-type->response-type t)
-                 ALL-RESPONSE-HEADERS
+                 (append (map ws-header->header (ws-response-headers r))
+                         (map (compose cookie->header ws-cookie->cookie) (ws-response-cookies r))
+                         ALL-RESPONSE-HEADERS)
                  (list response-data-bytes)))
 
 ;; ResponseErrorCode -> web-server/http/response
@@ -95,6 +97,16 @@
   (cond [(string? rd) (string->bytes/utf-8 rd)]
         [else (jsexpr->bytes (serialize-json rd serializers))]))
 
+;; Header -> web-server/http/header
+;; convert an internal cookie to an external cookie
+(define (ws-header->header h)
+  (header (string->bytes/utf-8 (ws-header-field h))
+          (string->bytes/utf-8 (ws-header-value h))))
+
+;; Cookie -> web-server/http/cookie
+;; convert an internal cookie to an external cookie
+(define (ws-cookie->cookie c)
+  (make-cookie (ws-cookie-name c) (ws-cookie-value c)))
 
 ;; String -> RequestPath
 ;; convert a string into a list of reuqest path parts
