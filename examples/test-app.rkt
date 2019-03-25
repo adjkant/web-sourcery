@@ -10,10 +10,10 @@
 (sourcery-struct session [(path STRING)])
 (sourcery-struct data [(field STRING) (timestamp INTEGER)])
 
-(struct basic-structure [here some data] #:transparent)
-(struct unserializable [struct] #:transparent)
-#;(struct sub basic-structure [])
+(struct basic-structure [here some data])
+(struct unserializable [struct])
 
+#;(struct sub basic-structure [])
 #;(json-serializer-struct sub)
 
 (define basic-structure-serializer (json-serializer-struct basic-structure))

@@ -4,7 +4,7 @@
 
 WebSourcery is intended to be a simple web framework to allow for quick and easy development that is also extendable and can be used at a decent scale.
 
-In conjunction with [SQLSourcery](https://github.com/adjkant/sql-sourcery), it is meant to be accessible with only the knowledge of [Racket](http://racket-lang.org/) and without database and web server technology knowledge. It is meant to be friendly to beginners with many optional defaults that create a usable web server.
+In conjunction with [SQLSourcery](https://github.com/adjkant/sql-sourcery), it is meant to be accessible with only the knowledge of [Racket](http://racket-lang.org/) and without large amounts of database and web server technology knowledge. It is meant to be friendly to beginners with many optional defaults that create a usable web server.
 
 WebSourcery is focused on server side computation but will also accommodate serving static files as well as rendering HTML templates. Native JSON support will allow for seamless Racket programming to translate into sensical JSON with little to no programmer effort. Each endpoint can be defined with routes including route parameters and complex route pattern matching. Static files can be served from an individual route or served from a folder like route.
 
