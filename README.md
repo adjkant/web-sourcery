@@ -26,7 +26,7 @@ WebSourcery will also include a testing library to make simulating requests easy
 ##### Potential Additional Features (Unsorted)
 - [ ] Local Connections Only T/F
 - [ ] CORS Support (overall, by function)
-- [ ] Handling OPTIONS / favicon requests properly
+- [ ] Handling OPTIONS / favicon requests properly / ".."/"." in requests
 - [ ] Combining / Modularizing Apps and Multiple File Error Checks
 - [ ] Expanded Error Messaging, Custom 404 Message, Public/Private Error Settings
 - [ ] Full Route Param Types (symbol, float/double)
