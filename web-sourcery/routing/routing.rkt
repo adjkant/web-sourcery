@@ -61,12 +61,13 @@
      
      
      #`(set! app-name
-             (add-route path
-                        (ws-route (string->path-template path)
-                                  (list one-method method ...)
-                                  (string->symbol #,(symbol->string response-type))
-                                  (lambda #,handler-inputs route-body))
-                        app-name))]))
+             (ws-app (ws-app-static-routes app-name)
+                     (add-route path
+                                (ws-route (string->path-template path)
+                                          (list one-method method ...)
+                                          (string->symbol #,(symbol->string response-type))
+                                          (lambda #,handler-inputs route-body))
+                                (ws-app-routes app-name))))]))
 
 ;; String Route WSApp
 ;; adds a route while throwing an error if the route path would be a duplicate
@@ -100,7 +101,7 @@
 ;; Handle any request to the server and return an apropriate response
 (define (handle-any-request/external req app serializers)
   (define internal-request (request->ws-request req))
-  (define matching-route (best-matching-route internal-request app))
+  (define matching-route (best-matching-route internal-request (ws-app-routes app)))
   (define internal-response (handle-any-request/internal internal-request app serializers))
   (internal-response->external-response internal-response matching-route serializers))
   
@@ -108,10 +109,14 @@
 ;; Request WSApp [List-of JSONSerializer] -> Response
 ;; Handle any request to the server and return an apropriate response
 (define (handle-any-request/internal req app serializers)
-  (define matching-route (best-matching-route req app))
-  (if matching-route
-      (call-route-with-req matching-route req serializers)
-      404))
+  (define matching-static-route
+    (best-matching-static-route (ws-request-path req) (ws-app-static-routes app)))
+  (define matching-route
+    (best-matching-route req (ws-app-routes app)))
+  (cond
+    [matching-static-route (find-static-file (ws-request-path req) matching-static-route)]
+    [matching-route (call-route-with-req matching-route req serializers)]
+    [else 404]))
         
 
 ;; Route Request [List-of JSONSerializer] -> Response

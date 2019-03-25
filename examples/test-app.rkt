@@ -34,6 +34,11 @@
 ;; Define an application
 (define-web-sourcery-app app)
 
+;; Serve Static Files
+
+(serve-from-folder [app "/static/"]
+                   "/static/")
+
 
 ;; Define Routes
 ;; ---------------------------------------------------
@@ -182,8 +187,7 @@
     (check-request [GET "/custom-response-code"] ->
                    [TEXT "I'm a little lambda short and sweet" (custom-status 250 "Little Lambda")])
 
-    #;(check-request [] -> [])
-    #;(check-request [GET "/"] -> [JSON basic-structure 201-CREATED])))
+    #;(check-request [] -> [])))
 
 ;; Run Application from a custom port
 #;(run-web-sourcery-app app

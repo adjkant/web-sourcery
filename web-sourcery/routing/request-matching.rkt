@@ -1,10 +1,13 @@
 #lang racket
 
-(provide best-matching-route
+(provide best-matching-static-route
+         find-static-file
+         best-matching-route
          parse-path-args)
 
 (require "../data/defs.rkt"
-         "../utils/basics.rkt")
+         "../utils/basics.rkt"
+         "../files/static-files.rkt")
 
 (module+ test (require "../utils/testing.rkt"
                        "../data/conversion.rkt"))
@@ -65,6 +68,44 @@
 
 
 ;; ---------------------------------------------------------------------------------------------------
+;; Static Route Matching
+
+;; RequestPath [List-of StaticRoute] -> [Maybe StaticRoute]
+;; find the best matching static route
+(define (best-matching-static-route req-path static-routes)
+  (define matching-static-routes (filter (λ (sr) (matching-static-route? req-path sr)) static-routes))
+  (when/f (cons? matching-static-routes)
+          (first matching-static-routes)))
+
+;; RequestPath StaticRoute -> Boolean
+;; Determine if a given request path is part of a static route
+(define (matching-static-route? req-path sr)
+  (define string-parts (map ws-req-path-part-string req-path))
+  (define app-path (ws-static-folder-route-app-path sr))
+  (when/f (> (length string-parts) (length app-path))
+          (and (andmap string=? app-path (take string-parts (length app-path)))
+               (andmap (λ (s) (not (string=? s "..")))
+                       (list-tail string-parts (length app-path))))))
+
+;; RequestPath StaticRoute -> Response
+;; Look for the given file in the static route and return the full file path
+;; return 404 if the file does not exist
+(define (find-static-file req-path sr)
+  (define string-parts (map ws-req-path-part-string req-path))
+  (define app-path (ws-static-folder-route-app-path sr))
+  (define requested-path-to-file (list-tail string-parts (length app-path)))
+  (define full-file-path (append (ws-static-folder-route-file-path sr) requested-path-to-file))
+  (define built-file-path (foldr (λ (p so-far) (string-append p "/" so-far)) "" full-file-path))
+  (define full-file-path-string (string-append "/"
+                                               (substring built-file-path
+                                                          0
+                                                          (sub1 (string-length built-file-path)))))
+  (if (file-exists? full-file-path-string)
+      full-file-path-string
+      404))
+
+
+;; ---------------------------------------------------------------------------------------------------
 ;; Route Matching
 
 
@@ -73,6 +114,7 @@
        [mr (in-value (make-matched-route req-path r))]
        #:unless (member? #false (second mr)))
     mr)
+
 ;; Request [List-of Route] -> [Maybe Route]
 ;; find the best matching route for the given Request
 (define (best-matching-route req routes)
@@ -93,8 +135,6 @@
   (when/f (cons? basic-matching-routes)
           (select-preferred-route basic-matching-routes)))
 
-;; TODO extensive testing on this function
-;; TODO check validity of route and trim empty string at end of routes?
 ;; User Note: "Trailing slashes are ignored during routing"
    
 
@@ -122,10 +162,6 @@
   (check-false (next-preferred-if-nonempty (list MATCHED-ROUTE-0 MATCHED-ROUTE-0)))
   (check-false (next-preferred-if-nonempty '()))
   (check-equal? (ws-route-path-temp (select-preferred-route MATCHED-ROUTES-1)) PATH-TEMP-1))
-
-;; TODO add test cases
-;; no basic matching routes
-;; more...
 
 ;; PathPartMatchResult [Maybe PathParamType] -> [MatchResult -> Boolean]
 ;; create a boolean filter function to select MatchResults with only

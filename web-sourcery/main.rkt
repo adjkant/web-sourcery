@@ -3,17 +3,33 @@
 (provide define-web-sourcery-app
          define-route
          run-web-sourcery-app
+
+         ;; HTTP Methods
          GET GET? POST POST? PUT PUT? DELETE DELETE? method->symbol
+         
+         ;; json-sourcery auto included
          (all-from-out json-sourcery)
+
+         ;; Headers, cookies, custom statuses, and query params
          (rename-out [user-response response]
                      [ws-status custom-status]
                      [ws-query-param query-param]
                      [ws-header header]
                      [ws-cookie cookie])
          with-headers with-cookies
+
+         ;; HTTP Status Codes
          (all-from-out "http/status-codes.rkt")
+
+         ;; Request Testing
          (all-from-out "request-testing/test-requests.rkt")
-         (struct-out ws-file))
+
+         ;; File Struct Access Ability
+         (struct-out ws-file)
+
+         ;; Static Files
+         serve-from-folder
+         )
 
 (require web-server/servlet
          web-server/servlet-env
@@ -24,6 +40,7 @@
          "data/defs.rkt"
          "response/response.rkt"
          "request-testing/test-requests.rkt"
+         "files/static-files.rkt"
          (for-syntax syntax/parse
                      racket/syntax))
 
@@ -37,7 +54,7 @@
 ;; Top Level WebSourcery App Definition
 (define-syntax define-web-sourcery-app
   (syntax-parser
-    [(_ app-name:id) #'(define app-name '())]))
+    [(_ app-name:id) #'(define app-name (ws-app '() '()))]))
 
 (module+ test
   (check-compile       (define-web-sourcery-app x))

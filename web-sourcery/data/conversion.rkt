@@ -6,9 +6,11 @@
  response-error-code->response
  response-error-code->string
  response-error-code->status
- strings->request-path)
+ strings->request-path
+ strings->static-folder-route)
 
 (require web-server/servlet
+         web-server/private/mime-types
          json
          json-sourcery
          "defs.rkt"
@@ -44,10 +46,12 @@
      (ws-response->external-response internal-response
                                      (ws-route-response-type matching-route)
                                      serializers)]
+    [(string? internal-response)
+     (file-path->external-file-response internal-response)]
     [(natural? internal-response)
      (response-error-code->response internal-response)]))
 
-;; ValidResponse ResponseType [List-of JSONSerializer] -> web-server/http/response
+;; DataResponse ResponseType [List-of JSONSerializer] -> web-server/http/response
 ;; Create an external response for a ws-response with the given type and serializers
 ;; invariant: all response data can be serialized
 (define (ws-response->external-response r t serializers)
@@ -61,6 +65,27 @@
                          ALL-RESPONSE-HEADERS)
                  (list response-data-bytes)))
 
+;; FileResponse -> web-server/http/response
+;; create a file response for the given file path
+(define (file-path->external-file-response file-path)
+  (response/full 200
+                 #"Ok"
+                 (current-seconds)
+                 (file->mime-type file-path)
+                 ALL-RESPONSE-HEADERS
+                 (list (file->bytes file-path))))
+
+;; FileResponse -> Bytes
+;; get the mime type for the given file
+(define (file->mime-type file-path)
+  (define file-ext (string->symbol (last (string-split file-path "."))))
+  (define mime-type-lookup-table (read-mime-types "../mime.types"))
+  (hash-ref mime-type-lookup-table file-ext))
+
+(define (string-checker s)
+  (λ (gs) (string=? s gs)))
+  
+
 ;; ResponseErrorCode -> web-server/http/response
 ;; convert an internal handler error code into an external response
 (define (response-error-code->response error-code)
@@ -70,7 +95,7 @@
                  (string->bytes/utf-8 (ws-status-description response-status))
                  (current-seconds)
                  TEXT/HTML-MIME-TYPE
-                 '()
+                 ALL-RESPONSE-HEADERS
                  (list (string->bytes/utf-8 error-string))))
 
 ;; ResponseErrorCode -> String
@@ -107,6 +132,13 @@
 ;; convert an internal cookie to an external cookie
 (define (ws-cookie->cookie c)
   (make-cookie (ws-cookie-name c) (ws-cookie-value c)))
+
+;; String String -> StaticFolderRoute
+;; convert a given app path and serving path into a StaticRoute
+(define (strings->static-folder-route app-path serve-path)
+  (define app-path-strings (trim-trailing-empty-string (string-split app-path "/")))
+  (define serve-path-strings (trim-trailing-empty-string (string-split serve-path "/")))
+  (ws-static-folder-route app-path-strings serve-path-strings))
 
 ;; String -> RequestPath
 ;; convert a string into a list of reuqest path parts
