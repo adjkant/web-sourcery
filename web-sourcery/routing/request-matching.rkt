@@ -87,9 +87,8 @@
                (andmap (λ (s) (not (string=? s "..")))
                        (list-tail string-parts (length app-path))))))
 
-;; RequestPath StaticRoute -> Response
-;; Look for the given file in the static route and return the full file path
-;; return 404 if the file does not exist
+;; RequestPath StaticRoute -> [Maybe Response]
+;; Look for the given file in the static route and return the full file path if it exists
 (define (find-static-file req-path sr)
   (define string-parts (map ws-req-path-part-string req-path))
   (define app-path (ws-static-folder-route-app-path sr))
@@ -100,9 +99,8 @@
                                                (substring built-file-path
                                                           0
                                                           (sub1 (string-length built-file-path)))))
-  (if (file-exists? full-file-path-string)
-      full-file-path-string
-      404))
+  (when/f (file-exists? full-file-path-string)
+          full-file-path-string))
 
 
 ;; ---------------------------------------------------------------------------------------------------

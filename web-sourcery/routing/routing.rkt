@@ -111,10 +111,13 @@
 (define (handle-any-request/internal req app serializers)
   (define matching-static-route
     (best-matching-static-route (ws-request-path req) (ws-app-static-routes app)))
+  (define static-file-response
+    (when/f matching-static-route
+            (find-static-file (ws-request-path req) matching-static-route)))
   (define matching-route
     (best-matching-route req (ws-app-routes app)))
   (cond
-    [matching-static-route (find-static-file (ws-request-path req) matching-static-route)]
+    [(and matching-static-route static-file-response) static-file-response]
     [matching-route (call-route-with-req matching-route req serializers)]
     [else 404]))
         

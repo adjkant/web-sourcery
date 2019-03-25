@@ -36,7 +36,7 @@
 
 ;; Serve Static Files
 
-(serve-from-folder [app "/static/"]
+(serve-from-folder [app "/"]
                    "/static/")
 
 

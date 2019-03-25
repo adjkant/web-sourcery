@@ -35,7 +35,7 @@ WebSourcery will also include a testing library to make simulating requests easy
 - [ ] Expanded Testing
 - [ ] Serve Single File
 - [ ] Header and Cookie Access Utilities
-
+- [ ] Efficiency Considerations
 
 ##### Testing
 - [ ] File Testing
