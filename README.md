@@ -36,13 +36,13 @@ WebSourcery will also include a testing library to make simulating requests easy
 - [x] Parameters
 - [x] Cookies
 - [x] Headers - Full or Filtered?
-- [ ] POST Data
+- [x] POST Data
 
 ##### Request Outputs
 - [x] Status Codes
 - [x] Return Types (JSON, HTML, Plaintext, ...?)
-- [ ] Headers
-- [ ] Cookies
+- [x] Headers
+- [x] Cookies
 
 ##### Routing
 - [x] Pattern Matching
@@ -51,12 +51,12 @@ WebSourcery will also include a testing library to make simulating requests easy
 - [x] Handler Connection
 
 ##### JSON
-- [ ] Input JSON Parsing (POST data)
+- [x] Input JSON Parsing (POST data)
 - [x] Output JSON Automation
 
 ##### Static Files
-- [ ] Single Folder / Convention
-- [ ] Default Static Folder
+- [ ] Single File
+- [x] Static Folders
 
 ##### Testing
 - [x] Quick Request Creation Shortcuts
