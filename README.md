@@ -17,58 +17,31 @@ WebSourcery will also include a testing library to make simulating requests easy
 
 * Simple Setup and Running
 * URL Routing with simplified essentials (HTTP Verbs, Cookies, Headers, JSON POST Data)
-* Integrated JSON Support
+* Integrated JSON Support - [JSONSourcery](https://github.com/adjkant/json-sourcery))
 * Simulated Requests Testing Library
 * Static Files and HTML Templating
 * SQLSourcery - Database ORM for Structures
 
 
-### Worklist
+##### Potential Additional Features (Unsorted)
+- [ ] Local Connections Only T/F
+- [ ] CORS Support (overall, by function)
+- [ ] Handling OPTIONS / favicon requests properly
+- [ ] Combining / Modularizing Apps and Multiple File Error Checks
+- [ ] Expanded Error Messaging, Custom 404 Message, Public/Private Error Settings
+- [ ] Full Route Param Types (symbol, float/double)
+- [ ] Handler Wrappers
+- [ ] HTML Templating (Using Formlets)
+- [ ] Expanded Testing
+- [ ] Serve Single File
+- [ ] Header and Cookie Access Utilities
 
-##### Setup
-- [x] Port Specification
-- [x] Local Connections Only T/F
-- [ ] CORS Support
-- [x] Statefulness Decisions
-
-##### Request Inputs
-- [x] Route
-- [x] Parameters
-- [x] Cookies
-- [x] Headers - Full or Filtered?
-- [x] POST Data
-
-##### Request Outputs
-- [x] Status Codes
-- [x] Return Types (JSON, HTML, Plaintext, ...?)
-- [x] Headers
-- [x] Cookies
-
-##### Routing
-- [x] Pattern Matching
-- [x] Route Parameters
-- [x] Typing
-- [x] Handler Connection
-
-##### JSON
-- [x] Input JSON Parsing (POST data)
-- [x] Output JSON Automation
-
-##### Static Files
-- [ ] Single File
-- [x] Static Folders
 
 ##### Testing
-- [x] Quick Request Creation Shortcuts
-- [x] Simulated Router/Handler Calls
-- [x] JSON Testing
+- [ ] File Testing
 - [ ] HTML Template Testing
 
-##### HTML Templating (Using Formlets)
+##### HTML Templating
 - [ ] Basic Key / Values
 - [ ] List and Repeat Constructs
 - [ ] If / Else Server Inclusion
-
-##### Additional Features
-- [ ] CORS by function
-- [ ] Combining / Modularizing Apps  
