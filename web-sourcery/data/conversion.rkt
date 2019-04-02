@@ -79,11 +79,8 @@
 ;; get the mime type for the given file
 (define (file->mime-type file-path)
   (define file-ext (string->symbol (last (string-split file-path "."))))
-  (define mime-type-lookup-table (read-mime-types "../mime.types"))
+  (define mime-type-lookup-table (read-mime-types "../mime.types")) ;; TODO wrap in mime types warning
   (hash-ref mime-type-lookup-table file-ext))
-
-(define (string-checker s)
-  (λ (gs) (string=? s gs)))
   
 
 ;; ResponseErrorCode -> web-server/http/response

@@ -93,8 +93,8 @@
 ;; TODO fix indentation
 (define-route [app "/return-cookie-and-header" [GET]] -> TEXT
   (with-headers (with-cookies (response "" 200-OK)
-                  (list (cookie "c" "d")))
-    (list (header "a" "b"))))
+                              (list (cookie "c" "d")))
+                (list (header "a" "b"))))
 
 #;(define-route [app "/return-cookie-and-header-alt" [GET]] -> TEXT
     (with-headers (with-cookies (response "" 200-OK) (cookie "c" "d")) (header "a" "b")))
